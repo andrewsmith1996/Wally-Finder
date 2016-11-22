@@ -1,0 +1,36 @@
+//
+//  matchImage.cpp
+//  assignment
+//
+//  Created by Andrew Smith on 14/11/2016.
+//  Copyright © 2016 Andrew Smith. All rights reserved.
+//
+
+#include "largeImage.h"
+#include <iostream>
+
+using namespace std;
+
+double* LargeImage::draw(int finalRow, int finalCol, double* cluttered_scene_input_data, int wallyRows, int wallyCols, int clutteredCols){
+    
+    cout << "Drawing Wally Area now..." << endl;
+
+    for(int rowCount = finalRow; rowCount <= finalRow + wallyRows; rowCount++){
+        for(int colCount = finalCol; colCount <= finalCol + wallyCols; colCount++){
+            
+            if(rowCount == finalRow || rowCount == finalRow + wallyRows){
+                for(int x = 0; x < 3; x++){
+                    cluttered_scene_input_data[(rowCount - x) * clutteredCols + (colCount - x)] = 0;
+                }
+            }
+            
+            if(colCount == finalCol || colCount == finalCol + wallyCols){
+                for(int x = 0; x < 3; x++){
+                    cluttered_scene_input_data[(rowCount - x) * clutteredCols + (colCount - x)] = 0;
+                }
+            }
+        }
+    }
+    return cluttered_scene_input_data;
+    
+}
