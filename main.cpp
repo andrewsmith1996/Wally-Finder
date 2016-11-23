@@ -13,6 +13,7 @@
 #include <fstream> // ifstream
 #include <istream>
 #include <vector>
+#include <algorithm>
 
 #include "matrix.h"
 #include "matchImage.h"
@@ -31,6 +32,18 @@ void WritePGM(string filename, double *data, int sizeR, int sizeC, int Q);
 
 //Prints the Progress of image
 void printProgress(int rowCount, int colCount, int clutteredCols, int clutteredRows);
+
+
+
+void quickSort(vector<MatchImage*>&,int,int);
+
+int partition(vector<MatchImage*>&, int,int);
+
+
+
+
+
+
 
 int main() {
     
@@ -84,13 +97,16 @@ int main() {
    
     MatchImage* tempMatrixObject = new MatchImage(wallyRows, wallyCols);
     
-    MatchImage* top10matches[10];
+   
     
     double* firstArea = sceneImage->getMatrixArea(0, 0, wallyRows, wallyCols);
     
     double firstSSD = sceneImage->workoutSSD(wallyMatrixArea, firstArea, wallyRows, wallyCols);
 
     delete[] firstArea;
+    
+    vector <MatchImage*> objects;
+   
     
     tempMatrixObject->setSSD(firstSSD);
     
@@ -113,26 +129,16 @@ int main() {
             compareMatrix->setStartingCol(colCount);
             compareMatrix->setSSD(SSD);
             
-            delete compareMatrix;
+            objects.push_back(compareMatrix);
             
-            cout << fixed << "SSD: " << SSD << endl;
+            delete compareMatrix;
           
-            if(SSD < tempMatrixObject->getSSD()){
+           /* if(SSD < tempMatrixObject->getSSD()){
                 tempMatrixObject->setSSD(SSD);
                 tempMatrixObject->setStartingRow(rowCount);
-                tempMatrixObject->setStartingCol(colCount);
-              
-                for(int x = 0; x < 10; x++){
-                    if(SSD < top10matches[x]->getSSD()){
-                        top10matches[x] = tempMatrixObject;
-                        break;
-                    }
-                }
-                
-                
-
-            }
-
+            }*/
+        
+            
             comparisons++;
             
         }
@@ -140,19 +146,23 @@ int main() {
     }
     
     
-    delete tempMatrixObject;
-  
+
+    int size = objects.size() - 1;
+    
+    quickSort(objects, 0, size);
+
+   
+
     cout << "Comparisons: " << comparisons << endl;
-    
-    
-    
+
     for(int x = 0; x < 10; x++){
+        cluttered_scene_input_data = sceneImage->draw(objects[x]->getStartingRow(), objects[x]->getStartingCol(), cluttered_scene_input_data, wallyRows, wallyCols, clutteredCols);
         
-        cluttered_scene_input_data = sceneImage->draw(top10matches[x]->getStartingRow(), top10matches[x]->getStartingCol(), cluttered_scene_input_data, wallyRows, wallyCols, clutteredCols);
+        //delete tempMatrixObject;
         
         //Write out the new scene showing where wally is. Q = 255 for greyscale images and 1 for binary images.
         int Q = 255;
-    
+        
         
         string outputFileName = "NNS_result_";
         
@@ -162,6 +172,9 @@ int main() {
         
         WritePGM(outputFileName, cluttered_scene_input_data, clutteredRows, clutteredCols, Q);
     }
+        
+    
+    
 
    
     
@@ -181,7 +194,7 @@ int main() {
     delete[] cluttered_scene_input_data;
     delete wallyImage;
     delete sceneImage;
-
+    
     
     return 0;
 }
@@ -264,6 +277,40 @@ void printProgress(int rowCount, int colCount, int clutteredCols, int clutteredR
     printf("\rSearching: %.2f%%", (pos / (clutteredCols * clutteredRows) * 100));
     cout << endl;
 
+}
+
+
+
+void quickSort(vector<MatchImage*>& A, int p,int q)
+{
+    int r;
+    if(p<q)
+    {
+        r=partition(A, p,q);
+        quickSort(A,p,r);
+        quickSort(A,r+1,q);
+    }
+}
+
+
+int partition(vector<MatchImage*>& A, int p,int q)
+{
+    int x= A[p]->getSSD();
+    int i=p;
+    int j;
+    
+    for(j=p+1; j<q; j++)
+    {
+        if(A[j]->getSSD()<=x)
+        {
+            i=i+1;
+            swap(A[i],A[j]);
+        }
+        
+    }
+    
+    swap(A[i],A[p]);
+    return i;
 }
 
 

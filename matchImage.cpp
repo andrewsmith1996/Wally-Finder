@@ -11,7 +11,12 @@
 #include <iostream>
 
 using namespace std;
-
+//
+//bool operator<(MatchImage &compareMatrix){
+//    double score = compareMatrix.getSSD();
+//    
+//    return MatchImage::getSSD() < score;
+//}
 
 int MatchImage::getStartingRow(){
     return startingRow;

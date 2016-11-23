@@ -11,9 +11,9 @@ using namespace std;
 #include "matrix.h"
 
 //Constructor
-Matrix::Matrix(int rows, int cols){
-    rows = rows;
-    cols = cols;
+Matrix::Matrix(int numRows, int numCols){
+    rows = numRows;
+    cols = numCols;
     
     matrixArray = new double*[rows];
     
@@ -26,7 +26,7 @@ Matrix::Matrix(int rows, int cols){
 }
 
 Matrix::~Matrix(){
-    
+
     //Delete elements in array
     for(int i = 0; i < rows; ++i){
         delete matrixArray[i];
@@ -35,8 +35,7 @@ Matrix::~Matrix(){
     //Delete whole Matrix array
     delete[] matrixArray;
     
-    cout << "Matrix was deallocated memory" << endl;
-    
+        
 }
 
 

@@ -20,7 +20,7 @@ class Matrix{
     public:
     
         //Constructor for Matrix
-        Matrix(int r, int c);
+        Matrix(int numRows, int numCols);
   
         //Deconstructor for Matrix
         ~Matrix();
@@ -40,7 +40,7 @@ class Matrix{
         void setSSD(int NNSscore);
         float getSSD();
     
-    double ** getMatrixArray();
+        double ** getMatrixArray();
     
 
 

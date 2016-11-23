@@ -18,6 +18,9 @@ class MatchImage : public Matrix{
     
         //Constructor for the MatchImage, basically from the original matrix
         MatchImage(int cols, int rows):Matrix(cols, rows){}
+    
+//    bool operator<(MatchImage &compareMatrix);
+    
     int getStartingRow();
     int getStartingCol();
     void setStartingRow(int row);
