@@ -13,7 +13,7 @@
 using namespace std;
 //
 //bool operator<(MatchImage &compareMatrix){
-//    double score = compareMatrix.getSSD();
+//    float score = compareMatrix.getSSD();
 //    
 //    return MatchImage::getSSD() < score;
 //}
@@ -34,7 +34,7 @@ void MatchImage::setStartingCol(int col){
     startingCol = col;
 }
 
-void MatchImage::populate(int numberOfRows, int numberOfCols, double** scene){
+void MatchImage::populate(int numberOfRows, int numberOfCols, float** scene){
     for(int rowCount = startingRow; rowCount < startingRow + numberOfRows; rowCount++){
         for(int colCount = startingCol; colCount < startingCol + numberOfCols; colCount++){
             matrixArray[rowCount][colCount] = matrixArray[rowCount][colCount];

@@ -16,10 +16,10 @@ Matrix::Matrix(int numRows, int numCols){
     rows = numRows;
     cols = numCols;
     
-    matrixArray = new double*[rows];
+    matrixArray = new float*[rows];
     
     for(int i = 0; i < rows; ++i){
-        matrixArray[i] = new double[cols];
+        matrixArray[i] = new float[cols];
         for(int j = 0; j < cols; ++j){
             matrixArray[i][j] = 0;
         }
@@ -46,8 +46,8 @@ float* Matrix::getMatrixArea(int row, int col, int numberRows, int numberCols){
     
     int count = 0;
 
-    for(int rowcount = row; rowcount < row + (numberRows - 1); rowcount++){
-        for(int colcount = col; colcount < col + (numberCols - 1); colcount++){
+    for(int rowcount = row; rowcount < row + numberRows; rowcount++){
+        for(int colcount = col; colcount < col + numberCols - 1; colcount++){
             matrixArea[count] = matrixArray[rowcount][colcount];
             count++;
         }
@@ -57,7 +57,7 @@ float* Matrix::getMatrixArea(int row, int col, int numberRows, int numberCols){
     
 }
 
-double** Matrix::getMatrixArray(){
+float** Matrix::getMatrixArray(){
     return matrixArray;
 }
 
@@ -70,17 +70,14 @@ void Matrix::setPixel(int row, int col, int code){
 float Matrix::workoutSSD(float wallyMatrix[], float sceneMatrix[], int wallyRows, int wallyCols){
    
     float SSD = 0.0, diff = 0.0;
-    /*for(int x = 0; x < wallyRows * wallyCols; x++){
-        SSD += (wallyMatrix[x] - sceneMatrix[x]) * (wallyMatrix[x] - sceneMatrix[x]);
-    }*/
-    
-
-    for(int i = 0; i < wallyRows - 1; i++){
-        for(int j = 0; j < wallyCols - 1; j++){
-            diff = wallyMatrix[wallyCols * i + j] - sceneMatrix[wallyCols * i + j];
-            SSD += diff * diff;
-        }
+  
+    for(int i = 0; i < wallyRows * wallyCols; i++){
+            //if(wallyMatrix[i] != 255){
+                diff = wallyMatrix[i] - sceneMatrix[i];
+                SSD += diff * diff;
+            //}
     }
+   
         
         
     
@@ -133,7 +130,6 @@ float Matrix::workoutNC(float wallyMatrix[], float sceneMatrix[], int wallyRows,
     
     NC = topLine / sqrt(leftSide * rightSide);
 
-    cout << fixed << "NC : " << NC << endl;
     
     
 
@@ -164,7 +160,7 @@ float Matrix::getSSD(){
 }
 
 //Method to set the NNS score of the matrix
-void Matrix::setSSD(double NNSscore){
+void Matrix::setSSD(float NNSscore){
     SSD = NNSscore;
 }
 
@@ -174,7 +170,7 @@ float Matrix::getNC(){
 }
 
 //Method to set the NNS score of the matrix
-void Matrix::setNC(double NCscore){
+void Matrix::setNC(float NCscore){
     NC = NCscore;
 }
 

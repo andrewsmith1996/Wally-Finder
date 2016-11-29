@@ -40,13 +40,14 @@ class Matrix{
     
         
     
-        void setSSD(double NNSscore);
+        void setSSD(float NNSscore);
+    
         float getSSD();
     
-        void setNC(double NCscore);
+        void setNC(float NCscore);
         float getNC();
     
-        double ** getMatrixArray();
+        float ** getMatrixArray();
     
 
 
@@ -59,7 +60,7 @@ class Matrix{
         float NC;
     
         //Definition of array rows
-        double** matrixArray;
+        float** matrixArray;
     };
 
 

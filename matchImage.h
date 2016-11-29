@@ -25,7 +25,7 @@ class MatchImage : public Matrix{
     int getStartingCol();
     void setStartingRow(int row);
     void setStartingCol(int col);
-    void populate(int numberOfRows, int numberOfCols, double** scene);
+    void populate(int numberOfRows, int numberOfCols, float** scene);
 protected:
     
     int startingRow;
