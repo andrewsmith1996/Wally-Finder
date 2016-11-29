@@ -20,13 +20,13 @@ double* LargeImage::draw(int finalRow, int finalCol, double* cluttered_scene_inp
             
             if(rowCount == finalRow || rowCount == finalRow + wallyRows){
                 for(int x = 0; x < 3; x++){
-                    cluttered_scene_input_data[(rowCount - x) * clutteredCols + (colCount - x)] = 0;
+                    cluttered_scene_input_data[clutteredCols * (rowCount - x) + (colCount - x)] = 0;
                 }
             }
             
             if(colCount == finalCol || colCount == finalCol + wallyCols){
                 for(int x = 0; x < 3; x++){
-                    cluttered_scene_input_data[(rowCount - x) * clutteredCols + (colCount - x)] = 0;
+                    cluttered_scene_input_data[clutteredCols * (rowCount - x) + (colCount - x)] = 0;
                 }
             }
         }
