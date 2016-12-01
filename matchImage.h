@@ -16,16 +16,15 @@
 class MatchImage : public Matrix{
     public:
     
-        //Constructor for the MatchImage, basically from the original matrix
         MatchImage(int cols, int rows):Matrix(cols, rows){}
     
-//    bool operator<(MatchImage &compareMatrix);
+
     
     int getStartingRow();
     int getStartingCol();
     void setStartingRow(int row);
     void setStartingCol(int col);
-    void populate(int numberOfRows, int numberOfCols, float** scene);
+    void populate(int numberOfRows, int numberOfCols, double** scene);
 protected:
     
     int startingRow;

@@ -11,7 +11,7 @@
 
 using namespace std;
 
-float* LargeImage::draw(int finalRow, int finalCol, float* cluttered_scene_input_data, int wallyRows, int wallyCols, int clutteredCols){
+double* LargeImage::draw(int finalRow, int finalCol, double* cluttered_scene_input_data, int wallyRows, int wallyCols, int clutteredCols){
     
     cout << "Drawing Wally Area now..." << endl;
 

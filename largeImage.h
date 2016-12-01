@@ -15,7 +15,7 @@
 class LargeImage : public Matrix{
     public:
         LargeImage(int cols, int rows):Matrix(cols, rows){}
-        float* draw(int finalRow, int finalCol, float* cluttered_scene_input_data, int wallyRows, int wallyCols, int clutteredCols);
+        double* draw(int finalRow, int finalCol, double* cluttered_scene_input_data, int wallyRows, int wallyCols, int clutteredCols);
 
    
 };

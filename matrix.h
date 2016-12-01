@@ -33,21 +33,22 @@ class Matrix{
     
         void setPixel(int row, int col, int code);
     
-        float* getMatrixArea(int row, int col, int rows, int cols);
+        double* getMatrixArea(int row, int col, int rows, int cols);
     
-        float workoutSSD(float wallyMatrix[], float sceneMatrix[], int wallyRows, int wallyCols);
-        float workoutNC(float wallyMatrix[], float sceneMatrix[], int wallyRows, int wallyCols);
+        double workoutSSD(double* wallyMatrix, double* sceneMatrix, int wallyRows, int wallyCols);
+        double workoutNC(double* wallyMatrix, double* sceneMatrix, int wallyRows, int wallyCols);
     
         
     
-        void setSSD(float NNSscore);
+        void setSSD(double NNSscore);
     
-        float getSSD();
+        double getSSD();
     
-        void setNC(float NCscore);
-        float getNC();
+        void setNC(double NCscore);
     
-        float ** getMatrixArray();
+        double getNC();
+    
+        double ** getMatrixArray();
     
 
 
@@ -56,11 +57,11 @@ class Matrix{
         int rows;
         int cols;
     
-        float SSD;
-        float NC;
+        double SSD;
+        double NC;
     
         //Definition of array rows
-        float** matrixArray;
+        double** matrixArray;
     };
 
 

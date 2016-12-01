@@ -24,11 +24,11 @@ using namespace std;
 
 //Prototypes
 
-//Reads .txt file and converts it to a 1D array of floats of size R*C
-float* readTXT(char *fileName, int sizeR, int sizeC);
+//Reads .txt file and converts it to a 1D array of doubles of size R*C
+double* readTXT(string fileName, int sizeR, int sizeC);
 
-//Converts 1D array of floats to .pgm image. Use Q = 255 for greyscale images and Q=1 for binary images.
-void WritePGM(string filename, float *data, int sizeR, int sizeC, int Q);
+//Converts 1D array of doubles to .pgm image. Use Q = 255 for greyscale images and Q=1 for binary images.
+void WritePGM(string filename, double *data, int sizeR, int sizeC, int Q);
 
 //Prints the Progress of image
 void printProgress(int rowCount, int colCount, int clutteredCols, int clutteredRows);
@@ -47,19 +47,21 @@ int main() {
     char* inputFileName = "Cluttered_scene.txt";
     char* wallyInputFileName = "Wally_Grey.txt";
     
-    //Creates pointers to 1D arrays of floats read in from the text files
-    float* cluttered_scene_input_data_NNS = 0;
-    float* cluttered_scene_input_data_NC = 0;
-   
-    
-    float* wally_input_data = 0;
+    //Creates pointers to 1D arrays of doubles read in from the text files
+    double* cluttered_scene_input_data_NNS = 0;
+    double* cluttered_scene_input_data_NC = 0;
+    double* wally_input_data = 0;
    
     //input_data to hold the colour codes of the text files
-    cluttered_scene_input_data_NNS = readTXT(inputFileName, clutteredRows, clutteredCols);
+    cluttered_scene_input_data_NNS = readTXT(inputFileName, clutteredRows, clutteredCols); // I AM FINE
     cluttered_scene_input_data_NC = readTXT(inputFileName, clutteredRows, clutteredCols);
-
-    wally_input_data = readTXT(wallyInputFileName, wallyRows, wallyCols);
-
+    
+    wally_input_data = readTXT(wallyInputFileName, wallyRows, wallyCols); // I AM FINE
+    
+    
+    
+    cout << "----------------------------------------------------------" << endl;
+    
     //Converts wally_input_datas into the a wally matrix
     int count = 0;
     for(int rowcount = 0; rowcount < wallyRows; rowcount++){
@@ -70,39 +72,43 @@ int main() {
     }
     
     
+    
     //Converts cluttered scene data into the cluttered scene matrix
     count = 0;
     for(int rowcount = 0; rowcount < clutteredRows; rowcount++){
         for(int colcount = 0; colcount < clutteredCols; colcount++){
+        
             sceneImage->setPixel(rowcount, colcount, cluttered_scene_input_data_NNS[count]);
             sceneImage->setPixel(rowcount, colcount, cluttered_scene_input_data_NC[count]);
             count++;
         }
     }
     
+ 
+    
     //Processing starts here
-    cout << "Data from text file\n----------------------------" << endl;
+    cout << "Data from text file" << endl << endl;
    
     int comparisons = 0;
     
     //Arrays that now contain the function section matrices
-    float* wallyMatrixArea = wallyImage->getMatrixArea(0, 0, wallyRows, wallyCols);
-    
-    
+    double* wallyMatrixArea = wallyImage->getMatrixArea(0, 0, wallyRows, wallyCols);
+
     MatchImage* tempMatrixObjectNNS = new MatchImage(wallyRows, wallyCols);
     MatchImage* tempMatrixObjectNC = new MatchImage(wallyRows, wallyCols);
     
-    float* matrixAtArea;
-    float SSD;
-    float NC;
+    double* matrixAtArea;
+    double SSD;
+    double NC;
 
     cout << "Searching for Wally..." << endl;
+    
 
     
     for(int rowCount = 0; rowCount < clutteredRows - wallyRows; rowCount++){
         for(int colCount = 0; colCount < clutteredCols - wallyCols; colCount++){
             
-                printProgress(rowCount, colCount, clutteredCols, clutteredRows);
+               // printProgress(rowCount, colCount, clutteredCols, clutteredRows);
 
                 //Get 1D array of the scene
                 matrixAtArea = sceneImage->getMatrixArea(rowCount, colCount, wallyRows, wallyCols);
@@ -111,7 +117,7 @@ int main() {
                 SSD = sceneImage->workoutSSD(wallyMatrixArea, matrixAtArea, wallyRows, wallyCols);
             
                 //Workout NC of scene area
-                NC = sceneImage->workoutNC(wallyMatrixArea, matrixAtArea, wallyRows, wallyCols);
+                //NC = sceneImage->workoutNC(wallyMatrixArea, matrixAtArea, wallyRows, wallyCols);
             
                 //Delete Matrix Area
                 delete[] matrixAtArea;
@@ -122,56 +128,40 @@ int main() {
                     tempMatrixObjectNNS->setStartingRow(rowCount);
                     tempMatrixObjectNNS->setSSD(SSD);
                 
-                    tempMatrixObjectNC->setStartingCol(colCount);
-                    tempMatrixObjectNC->setStartingRow(rowCount);
-                    tempMatrixObjectNC->setNC(NC);
+//                    tempMatrixObjectNC->setStartingCol(colCount);
+//                    tempMatrixObjectNC->setStartingRow(rowCount);
+//                    tempMatrixObjectNC->setNC(NC);
                 }
             
-                cout << fixed << "Old Value: " << tempMatrixObjectNNS->getSSD() << endl;
-                cout << fixed << "New Value: " << SSD << endl;
             
             
-
                 //Check if new SSD is smaller than what's stored in the current object, if it is then override the object, else continue
                 if(SSD < tempMatrixObjectNNS->getSSD()){
                     tempMatrixObjectNNS->setSSD(SSD);
                     tempMatrixObjectNNS->setStartingRow(rowCount);
                     tempMatrixObjectNNS->setStartingCol(colCount);
-                    cout << "SMALLER" << endl;
-                } else{
-                    cout << "BIGGER" << endl;
+                        
                 }
+//            
+//                if(NC < tempMatrixObjectNC->getNC()){
+//                    tempMatrixObjectNC->setNC(NC);
+//                    tempMatrixObjectNC->setStartingRow(rowCount);
+//                    tempMatrixObjectNC->setStartingCol(colCount);
+//                }
+//            
             
-                if(NC < tempMatrixObjectNC->getNC()){
-                    tempMatrixObjectNC->setNC(NC);
-                    tempMatrixObjectNC->setStartingRow(rowCount);
-                    tempMatrixObjectNC->setStartingCol(colCount);
-                }
-            
-            
-         
-           
-           
-            
-                      
             comparisons++;
 
         }
         
     }
     
-    
-
- 
-
-   
-
     cout << "Comparisons: " << comparisons << endl;
 
 
         cluttered_scene_input_data_NNS = sceneImage->draw(tempMatrixObjectNNS->getStartingRow(), tempMatrixObjectNNS->getStartingCol(), cluttered_scene_input_data_NNS, wallyRows, wallyCols, clutteredCols);
     
-        cluttered_scene_input_data_NC = sceneImage->draw(tempMatrixObjectNC->getStartingRow(), tempMatrixObjectNC->getStartingCol(), cluttered_scene_input_data_NC, wallyRows, wallyCols, clutteredCols);
+        //cluttered_scene_input_data_NC = sceneImage->draw(tempMatrixObjectNC->getStartingRow(), tempMatrixObjectNC->getStartingCol(), cluttered_scene_input_data_NC, wallyRows, wallyCols, clutteredCols);
     
     
     
@@ -181,7 +171,7 @@ int main() {
         int Q = 255;
         
         
-        string outputFileName_NNS = "NNS_result.pgm";
+        string outputFileName_NNS = "SSD_result.pgm";
         string outputFileName_NC = "NC_result.pgm";
         string outputFileName_test = "test_result.pgm";
 
@@ -206,7 +196,7 @@ int main() {
     delete[] cluttered_scene_input_data_NNS;
     
 
-     delete[] cluttered_scene_input_data_NC;
+    delete[] cluttered_scene_input_data_NC;
     delete wallyImage;
     delete sceneImage;
     
@@ -215,11 +205,11 @@ int main() {
 }
 
 
-// Read .txt file with image of size RxC, and convert to an array of floats
-float* readTXT(char* fileName, int sizeR, int sizeC){
+// Read .txt file with image of size RxC, and convert to an array of doubles
+double* readTXT(string fileName, int sizeR, int sizeC){
     
-    //Data Array - 1D Array of floats
-    float* data = new float[sizeR*sizeC];
+    //Data Array - 1D Array of doubles
+    double* data = new double[sizeR*sizeC];
    
     int i = 0;
    
@@ -247,8 +237,8 @@ float* readTXT(char* fileName, int sizeR, int sizeC){
     return data;
 }
 
-// convert data from float to .pgm stored in filename
-void WritePGM(string filename, float *data, int sizeR, int sizeC, int Q){
+// convert data from double to .pgm stored in filename
+void WritePGM(string filename, double *data, int sizeR, int sizeC, int Q){
     
     int i, j;
     unsigned char *image;
@@ -288,7 +278,7 @@ void WritePGM(string filename, float *data, int sizeR, int sizeC, int Q){
 
 void printProgress(int rowCount, int colCount, int clutteredCols, int clutteredRows){
     //Print % of being done
-    float pos = (rowCount * clutteredCols  + colCount);
+    double pos = (rowCount * clutteredCols  + colCount);
     printf("\rSearching: %.2f%%", (pos / (clutteredCols * clutteredRows) * 100));
     cout << endl;
 

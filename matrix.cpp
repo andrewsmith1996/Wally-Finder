@@ -14,14 +14,14 @@ using namespace std;
 //Constructor
 Matrix::Matrix(int numRows, int numCols){
     rows = numRows;
-    cols = numCols;
+    cols = numCols; 
     
-    matrixArray = new float*[rows];
+    matrixArray = new double*[rows];
     
     for(int i = 0; i < rows; ++i){
-        matrixArray[i] = new float[cols];
+        matrixArray[i] = new double[cols];
         for(int j = 0; j < cols; ++j){
-            matrixArray[i][j] = 0;
+            matrixArray[i][j] = 0.0;
         }
     }
 }
@@ -35,21 +35,21 @@ Matrix::~Matrix(){
     
     //Delete whole Matrix array
     delete[] matrixArray;
-    
         
 }
 
 
-float* Matrix::getMatrixArea(int row, int col, int numberRows, int numberCols){
+double* Matrix::getMatrixArea(int row, int col, int numberRows, int numberCols){
   
-    float* matrixArea = new float[numberRows * numberCols];
+    double* matrixArea = new double[numberRows * numberCols];
     
     int count = 0;
-
+    
+    
     for(int rowcount = row; rowcount < row + numberRows; rowcount++){
-        for(int colcount = col; colcount < col + numberCols - 1; colcount++){
-            matrixArea[count] = matrixArray[rowcount][colcount];
-            count++;
+        for(int colcount = col; colcount < col + numberCols; colcount++){
+                matrixArea[count] = matrixArray[rowcount][colcount];
+                count++;
         }
     }
     
@@ -57,82 +57,66 @@ float* Matrix::getMatrixArea(int row, int col, int numberRows, int numberCols){
     
 }
 
-float** Matrix::getMatrixArray(){
+double** Matrix::getMatrixArray(){
     return matrixArray;
 }
 
 
 void Matrix::setPixel(int row, int col, int code){
-    matrixArray[row][col] = code;
+        matrixArray[row][col] = code;
+    
 }
 
 
-float Matrix::workoutSSD(float wallyMatrix[], float sceneMatrix[], int wallyRows, int wallyCols){
-   
-    float SSD = 0.0, diff = 0.0;
+double Matrix::workoutSSD(double* wallyMatrix, double* sceneMatrix, int wallyRows, int wallyCols){
+    
+    double SSD = 0.0, diff = 0.0;
   
     for(int i = 0; i < wallyRows * wallyCols; i++){
-            //if(wallyMatrix[i] != 255){
+       // cout << wallyMatrix[i] << " " << sceneMatrix[i] << endl;
+        
+            if(wallyMatrix[i] != 255){
                 diff = wallyMatrix[i] - sceneMatrix[i];
                 SSD += diff * diff;
-            //}
+            }
     }
-   
-        
-        
     
     return SSD;
 }
 
 
-
-
-float Matrix::workoutNC(float wallyMatrix[], float sceneMatrix[], int wallyRows, int wallyCols){
- 
-    
-    
-    float pixelTotalScene = 0.0, pixelTotalWally = 0.0, NC = 0.0, meanOfWally = 0.0, meanOfScene = 0.0, topLine = 0.0, leftSide = 0.0, rightSide = 0.0;
+double Matrix::workoutNC(double* wallyMatrix, double* sceneMatrix, int wallyRows, int wallyCols){
+    double* tempWallyMatrix = wallyMatrix;
+    double pixelTotalScene = 0.0, pixelTotalWally = 0.0, NC = 0.0, meanOfWally = 0.0, meanOfScene = 0.0, topLine = 0.0, leftSide = 0.0, rightSide = 0.0;
     
     //Calculate sum of scene and wally matrices
     for(int y = 0; y < wallyRows * wallyCols; y++){
         pixelTotalScene += sceneMatrix[y];
-        pixelTotalWally += wallyMatrix[y];
+        pixelTotalWally += tempWallyMatrix[y];
     }
     
-//    cout << fixed <<"pixelTotalScene : " << pixelTotalScene << endl;
-//    cout << fixed <<"pixelTotalWally : " << pixelTotalWally << endl;
-    
+
     meanOfWally = pixelTotalWally / (wallyRows * wallyCols);
     meanOfScene = pixelTotalScene / (wallyRows * wallyCols);
-    
-//    cout << fixed << "meanOfWally : " << meanOfWally << endl;
-//    cout << fixed << "meanOfScene : " << meanOfScene << endl;
-
     
     //Take away mean from each pixel
     for(int y = 0; y < wallyRows * wallyCols; y++){
         sceneMatrix[y] -= meanOfScene;
-        wallyMatrix[y] -= meanOfWally;
+        tempWallyMatrix[y] -= meanOfWally;
     }
-    
-    
     
     
     for(int y = 0; y < wallyRows * wallyCols; y++){
-        topLine += wallyMatrix[y] * sceneMatrix[y];
-        leftSide += wallyMatrix[y] * wallyMatrix[y];
+        topLine += tempWallyMatrix[y] * sceneMatrix[y];
+        leftSide += tempWallyMatrix[y] * tempWallyMatrix[y];
         rightSide += sceneMatrix[y] * sceneMatrix[y];
     }
     
-//    cout << fixed << "topLine : " << topLine << endl;
-//    cout << fixed <<"leftSide : " << leftSide << endl;
-//    cout << fixed <<"rightSide : " << rightSide << endl;
-    
+
     NC = topLine / sqrt(leftSide * rightSide);
 
     
     
-
     
     return NC;
 }
@@ -145,9 +129,9 @@ float Matrix::workoutNC(float wallyMatrix[], float sceneMatrix[], int wallyRows,
 //Method to print the whole Matrix out
 void Matrix::printMatrix(){
    
-    for(int col = 0; col < cols; col++){
-        for(int row = 0; row < rows; row++){
-            cout << matrixArray[col][row] << " ";
+    for(int row = 0; row < rows; row++){
+        for(int col = 0; col < cols; col++){
+            cout << matrixArray[row][col] << " ";
         }
         cout << "\n";
        
@@ -155,22 +139,22 @@ void Matrix::printMatrix(){
 }
 
 
-float Matrix::getSSD(){
+double Matrix::getSSD(){
     return SSD;
 }
 
 //Method to set the NNS score of the matrix
-void Matrix::setSSD(float NNSscore){
+void Matrix::setSSD(double NNSscore){
     SSD = NNSscore;
 }
 
 
-float Matrix::getNC(){
+double Matrix::getNC(){
     return NC;
 }
 
 //Method to set the NNS score of the matrix
-void Matrix::setNC(float NCscore){
+void Matrix::setNC(double NCscore){
     NC = NCscore;
 }
 
