@@ -117,7 +117,7 @@ int main() {
                 SSD = sceneImage->workoutSSD(wallyMatrixArea, matrixAtArea, wallyRows, wallyCols);
             
                 //Workout NC of scene area
-                //NC = sceneImage->workoutNC(wallyMatrixArea, matrixAtArea, wallyRows, wallyCols);
+                NC = sceneImage->workoutNC(wallyMatrixArea, matrixAtArea, wallyRows, wallyCols);
             
                 //Delete Matrix Area
                 delete[] matrixAtArea;
@@ -128,11 +128,10 @@ int main() {
                     tempMatrixObjectNNS->setStartingRow(rowCount);
                     tempMatrixObjectNNS->setSSD(SSD);
                 
-//                    tempMatrixObjectNC->setStartingCol(colCount);
-//                    tempMatrixObjectNC->setStartingRow(rowCount);
-//                    tempMatrixObjectNC->setNC(NC);
+                    tempMatrixObjectNC->setStartingCol(colCount);
+                    tempMatrixObjectNC->setStartingRow(rowCount);
+                    tempMatrixObjectNC->setNC(NC);
                 }
-            
             
             
                 //Check if new SSD is smaller than what's stored in the current object, if it is then override the object, else continue
@@ -142,13 +141,13 @@ int main() {
                     tempMatrixObjectNNS->setStartingCol(colCount);
                         
                 }
-//            
-//                if(NC < tempMatrixObjectNC->getNC()){
-//                    tempMatrixObjectNC->setNC(NC);
-//                    tempMatrixObjectNC->setStartingRow(rowCount);
-//                    tempMatrixObjectNC->setStartingCol(colCount);
-//                }
-//            
+            
+                if(NC > tempMatrixObjectNC->getNC()){
+                    tempMatrixObjectNC->setNC(NC);
+                    tempMatrixObjectNC->setStartingRow(rowCount);
+                    tempMatrixObjectNC->setStartingCol(colCount);
+                }
+            
             
             comparisons++;
 
@@ -158,38 +157,23 @@ int main() {
     
     cout << "Comparisons: " << comparisons << endl;
 
-
+    cout << "NC : " << tempMatrixObjectNC->getNC() << endl;
         cluttered_scene_input_data_NNS = sceneImage->draw(tempMatrixObjectNNS->getStartingRow(), tempMatrixObjectNNS->getStartingCol(), cluttered_scene_input_data_NNS, wallyRows, wallyCols, clutteredCols);
     
-        //cluttered_scene_input_data_NC = sceneImage->draw(tempMatrixObjectNC->getStartingRow(), tempMatrixObjectNC->getStartingCol(), cluttered_scene_input_data_NC, wallyRows, wallyCols, clutteredCols);
+        cluttered_scene_input_data_NC = sceneImage->draw(tempMatrixObjectNC->getStartingRow(), tempMatrixObjectNC->getStartingCol(), cluttered_scene_input_data_NC, wallyRows, wallyCols, clutteredCols);
     
-    
-    
- 
-        
         //Write out the new scene showing where wally is. Q = 255 for greyscale images and 1 for binary images.
         int Q = 255;
-        
-        
+    
         string outputFileName_NNS = "SSD_result.pgm";
         string outputFileName_NC = "NC_result.pgm";
         string outputFileName_test = "test_result.pgm";
-
-
     
-        
         WritePGM(outputFileName_NNS, cluttered_scene_input_data_NNS, clutteredRows, clutteredCols, Q);
     
         WritePGM(outputFileName_NC, cluttered_scene_input_data_NC, clutteredRows, clutteredCols, Q);
     
-    
-
-    
         cout << "Processing Complete." << endl;
-    
-    
-
-   
 
     
     //Delete objects
