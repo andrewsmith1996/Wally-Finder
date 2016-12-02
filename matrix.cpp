@@ -41,6 +41,8 @@ Matrix::Matrix(int numRows, int numCols){
     }
 }
 
+
+
 Matrix::~Matrix(){
 
     //Delete elements in array
@@ -72,7 +74,7 @@ double* Matrix::getMatrixArea(int row, int col, int numberRows, int numberCols){
     
 }
 
-double** Matrix::getMatrixArray(){
+double** Matrix::getMatrixArray() const{
     return matrixArray;
 }
 
@@ -100,15 +102,14 @@ double Matrix::workoutSSD(double* wallyMatrix, double* sceneMatrix, int wallyRow
 
 double Matrix::workoutNC(double* wallyMatrix, double* sceneMatrix, int wallyRows, int wallyCols){
  
-    //Deep copy
-    double* tempWallyMatrix = new double[wallyRows * wallyCols];
+    double pixelTotalScene = 0.0, pixelTotalWally = 0.0, NC = 0.0, meanOfWally = 0.0, meanOfScene = 0.0, topLine = 0.0, leftSide = 0.0, rightSide = 0.0;
     
+    //Deep copy of wallyMatrix to a new temp wallyMatrix so the original isn't overwritten via the pointer
+    double* tempWallyMatrix = new double[wallyRows * wallyCols];
     for(int ii = 0; ii < wallyRows * wallyCols; ii++){
             tempWallyMatrix[ii] = wallyMatrix[ii];
         
     }
-    
-    double pixelTotalScene = 0.0, pixelTotalWally = 0.0, NC = 0.0, meanOfWally = 0.0, meanOfScene = 0.0, topLine = 0.0, leftSide = 0.0, rightSide = 0.0;
     
     //Calculate sum of scene and wally matrices
     for(int y = 0; y < wallyRows * wallyCols; y++){
@@ -116,6 +117,7 @@ double Matrix::workoutNC(double* wallyMatrix, double* sceneMatrix, int wallyRows
             pixelTotalScene += sceneMatrix[y];
     }
     
+    //Get means of the sections
     meanOfWally = (1 / (wallyRows * wallyCols)) * pixelTotalWally;
     meanOfScene = (1 / (wallyRows * wallyCols)) * pixelTotalScene;
 
@@ -125,7 +127,8 @@ double Matrix::workoutNC(double* wallyMatrix, double* sceneMatrix, int wallyRows
             sceneMatrix[y] -= meanOfScene;
         
     }
-
+    
+    //Get sum of each pixel multiplied by each pixel
     for(int y = 0; y < wallyRows * wallyCols; y++){
             topLine += sceneMatrix[y] * tempWallyMatrix[y];
             
@@ -133,10 +136,9 @@ double Matrix::workoutNC(double* wallyMatrix, double* sceneMatrix, int wallyRows
     
     delete[] tempWallyMatrix;
 
-
+    //Compute Normalised Correlation
     NC = topLine / sqrt((pixelTotalWally * pixelTotalWally) * (pixelTotalScene * pixelTotalScene));
     
-
     
     return NC;
 }

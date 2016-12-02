@@ -49,7 +49,9 @@ class Matrix{
     
         double getNC();
     
-        double ** getMatrixArray();
+        double ** getMatrixArray() const;
+    
+        
     
 
 
@@ -62,7 +64,7 @@ class Matrix{
         double NC;
     
         //Definition of array rows
-        double** matrixArray;
+         double** matrixArray;
     };
 
 

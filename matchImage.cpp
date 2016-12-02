@@ -27,6 +27,12 @@ MatchImage::MatchImage(){
     }
 }
 
+//Copy Constructor
+MatchImage::MatchImage(const Matrix& temp){
+    cout << "Copy Constructor called!" << endl;
+    matrixArray = temp.getMatrixArray();
+}
+
 
 int MatchImage::getStartingRow(){
     return startingRow;

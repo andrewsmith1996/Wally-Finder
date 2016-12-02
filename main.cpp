@@ -95,7 +95,9 @@ int main() {
     double* wallyMatrixArea = wallyImage->getMatrixArea(0, 0, wallyRows, wallyCols);
 
     MatchImage* tempMatrixObjectNNS = new MatchImage();
-    MatchImage* tempMatrixObjectNC = new MatchImage();
+    MatchImage tempMatrixObjectNC = *tempMatrixObjectNNS;
+    
+    
     
     double* matrixAtArea;
     double SSD;
@@ -108,7 +110,7 @@ int main() {
     for(int rowCount = 0; rowCount < clutteredRows - wallyRows; rowCount++){
         for(int colCount = 0; colCount < clutteredCols - wallyCols; colCount++){
             
-               // printProgress(rowCount, colCount, clutteredCols, clutteredRows);
+                //printProgress(rowCount, colCount, clutteredCols, clutteredRows);
 
                 //Get 1D array of the scene
                 matrixAtArea = sceneImage->getMatrixArea(rowCount, colCount, wallyRows, wallyCols);
@@ -128,9 +130,9 @@ int main() {
                     tempMatrixObjectNNS->setStartingRow(rowCount);
                     tempMatrixObjectNNS->setSSD(SSD);
                 
-                    tempMatrixObjectNC->setStartingCol(colCount);
-                    tempMatrixObjectNC->setStartingRow(rowCount);
-                    tempMatrixObjectNC->setNC(NC);
+                    tempMatrixObjectNC.setStartingCol(colCount);
+                    tempMatrixObjectNC.setStartingRow(rowCount);
+                    tempMatrixObjectNC.setNC(NC);
                 }
             
             
@@ -142,10 +144,10 @@ int main() {
                         
                 }
             
-                if(NC > tempMatrixObjectNC->getNC()){
-                    tempMatrixObjectNC->setNC(NC);
-                    tempMatrixObjectNC->setStartingRow(rowCount);
-                    tempMatrixObjectNC->setStartingCol(colCount);
+                if(NC > tempMatrixObjectNC.getNC()){
+                    tempMatrixObjectNC.setNC(NC);
+                    tempMatrixObjectNC.setStartingRow(rowCount);
+                    tempMatrixObjectNC.setStartingCol(colCount);
                 }
             
             
@@ -157,10 +159,10 @@ int main() {
     
     cout << "Comparisons: " << comparisons << endl;
 
-    cout << "NC : " << tempMatrixObjectNC->getNC() << endl;
+  
         cluttered_scene_input_data_NNS = sceneImage->draw(tempMatrixObjectNNS->getStartingRow(), tempMatrixObjectNNS->getStartingCol(), cluttered_scene_input_data_NNS, wallyRows, wallyCols, clutteredCols);
     
-        cluttered_scene_input_data_NC = sceneImage->draw(tempMatrixObjectNC->getStartingRow(), tempMatrixObjectNC->getStartingCol(), cluttered_scene_input_data_NC, wallyRows, wallyCols, clutteredCols);
+        cluttered_scene_input_data_NC = sceneImage->draw(tempMatrixObjectNC.getStartingRow(), tempMatrixObjectNC.getStartingCol(), cluttered_scene_input_data_NC, wallyRows, wallyCols, clutteredCols);
     
         //Write out the new scene showing where wally is. Q = 255 for greyscale images and 1 for binary images.
         int Q = 255;

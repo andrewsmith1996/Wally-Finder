@@ -21,10 +21,14 @@ class MatchImage : public Matrix{
     //Overloaded inherited constructor
     MatchImage(int cols, int rows):Matrix(cols, rows){}
     
+    //Copy constructor
+    MatchImage(const Matrix& temp);
+    
     int getStartingRow();
     int getStartingCol();
     void setStartingRow(int row);
     void setStartingCol(int col);
+    
     void populate(int numberOfRows, int numberOfCols, double** scene);
 protected:
     
