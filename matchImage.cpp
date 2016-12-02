@@ -11,12 +11,22 @@
 #include <iostream>
 
 using namespace std;
-//
-//bool operator<(MatchImage &compareMatrix){
-//    double score = compareMatrix.getSSD();
-//    
-//    return MatchImage::getSSD() < score;
-//}
+
+//Default constructor when not using the specified constructor
+MatchImage::MatchImage(){
+    rows = 49;
+    cols = 36;
+    
+    matrixArray = new double*[rows];
+    
+    for(int i = 0; i < rows; ++i){
+        matrixArray[i] = new double[cols];
+        for(int j = 0; j < cols; ++j){
+            matrixArray[i][j] = 0.0;
+        }
+    }
+}
+
 
 int MatchImage::getStartingRow(){
     return startingRow;

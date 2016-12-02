@@ -19,9 +19,10 @@ using namespace std;
 class Matrix{
     public:
     
-        //Constructor for Matrix
-        Matrix(int numRows, int numCols);
-  
+        //Constructors for Matrix
+         Matrix();
+         Matrix(int numRows, int numCols);
+    
         //Deconstructor for Matrix
         ~Matrix();
     

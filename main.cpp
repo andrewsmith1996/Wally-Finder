@@ -40,7 +40,7 @@ int main() {
     int clutteredRows = 768, clutteredCols = 1024, wallyRows = 49, wallyCols = 36;
     
     //Initiate the Matrixes
-    MatchImage* wallyImage = new MatchImage(wallyRows, wallyCols);
+    MatchImage* wallyImage = new MatchImage();
     LargeImage* sceneImage = new LargeImage(clutteredRows, clutteredCols);
     
     //File names for reading in the images from the text files
@@ -94,8 +94,8 @@ int main() {
     //Arrays that now contain the function section matrices
     double* wallyMatrixArea = wallyImage->getMatrixArea(0, 0, wallyRows, wallyCols);
 
-    MatchImage* tempMatrixObjectNNS = new MatchImage(wallyRows, wallyCols);
-    MatchImage* tempMatrixObjectNC = new MatchImage(wallyRows, wallyCols);
+    MatchImage* tempMatrixObjectNNS = new MatchImage();
+    MatchImage* tempMatrixObjectNC = new MatchImage();
     
     double* matrixAtArea;
     double SSD;

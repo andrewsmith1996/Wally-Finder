@@ -11,7 +11,22 @@ using namespace std;
 #include "matrix.h"
 #include "math.h"
 
-//Constructor
+//Default constructor creates a 1x1 Matrix
+Matrix::Matrix(){
+    rows = 1;
+    cols = 1;
+    
+    matrixArray = new double*[rows];
+    
+    for(int i = 0; i < rows; ++i){
+        matrixArray[i] = new double[cols];
+        for(int j = 0; j < cols; ++j){
+            matrixArray[i][j] = 0.0;
+        }
+    }
+}
+
+//Overloaded constructor for specifying the Matrix dimensions
 Matrix::Matrix(int numRows, int numCols){
     rows = numRows;
     cols = numCols; 

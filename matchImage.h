@@ -16,9 +16,10 @@
 class MatchImage : public Matrix{
     public:
     
-        MatchImage(int cols, int rows):Matrix(cols, rows){}
-    
-
+    //Default constructor
+    MatchImage();
+    //Overloaded inherited constructor
+    MatchImage(int cols, int rows):Matrix(cols, rows){}
     
     int getStartingRow();
     int getStartingCol();
