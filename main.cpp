@@ -37,32 +37,30 @@ void printProgress(int rowCount, int colCount, int clutteredCols, int clutteredR
 int main() {
     
     //M and N represent the number of rows and columns in the image. Cluttered_scene, M = 768, N = 1024, Wally_grey, M = 49, N =  36
-    int clutteredRows = 768, clutteredCols = 1024, wallyRows = 49, wallyCols = 36;
+    int clutteredRows = 768, clutteredCols = 1024, wallyRows = 49, wallyCols = 36, comparisons = 0;
+    double SSD, NC;
     
-    //Initiate the Matrixes
+    //Initiate the Matrices
     MatchImage* wallyImage = new MatchImage();
     LargeImage* sceneImage = new LargeImage(clutteredRows, clutteredCols);
     
     //File names for reading in the images from the text files
-    char* inputFileName = "Cluttered_scene.txt";
-    char* wallyInputFileName = "Wally_Grey.txt";
+    string inputFileName = "Cluttered_scene.txt", wallyInputFileName = "Wally_Grey.txt";
     
     //Creates pointers to 1D arrays of doubles read in from the text files
     double* cluttered_scene_input_data_NNS = 0;
     double* cluttered_scene_input_data_NC = 0;
     double* wally_input_data = 0;
+    double* matrixAtArea;
    
     //input_data to hold the colour codes of the text files
-    cluttered_scene_input_data_NNS = readTXT(inputFileName, clutteredRows, clutteredCols); // I AM FINE
+    cluttered_scene_input_data_NNS = readTXT(inputFileName, clutteredRows, clutteredCols);
     cluttered_scene_input_data_NC = readTXT(inputFileName, clutteredRows, clutteredCols);
+    wally_input_data = readTXT(wallyInputFileName, wallyRows, wallyCols);
     
-    wally_input_data = readTXT(wallyInputFileName, wallyRows, wallyCols); // I AM FINE
+
     
-    
-    
-    cout << "----------------------------------------------------------" << endl;
-    
-    //Converts wally_input_datas into the a wally matrix
+    //Sets the colour codes to the Matrix for the Wally matrix
     int count = 0;
     for(int rowcount = 0; rowcount < wallyRows; rowcount++){
         for(int colcount = 0; colcount < wallyCols; colcount++){
@@ -72,59 +70,49 @@ int main() {
     }
     
     
-    
-    //Converts cluttered scene data into the cluttered scene matrix
+    //Sets the colour codes to the Matrix for the cluttered scene
     count = 0;
     for(int rowcount = 0; rowcount < clutteredRows; rowcount++){
         for(int colcount = 0; colcount < clutteredCols; colcount++){
-        
             sceneImage->setPixel(rowcount, colcount, cluttered_scene_input_data_NNS[count]);
             sceneImage->setPixel(rowcount, colcount, cluttered_scene_input_data_NC[count]);
             count++;
         }
     }
     
- 
-    
-    //Processing starts here
-    cout << "Data from text file" << endl << endl;
-   
-    int comparisons = 0;
+
     
     //Arrays that now contain the function section matrices
     double* wallyMatrixArea = wallyImage->getMatrixArea(0, 0, wallyRows, wallyCols);
 
+    //Create the temporary objects using a copy constructor
     MatchImage* tempMatrixObjectNNS = new MatchImage();
     MatchImage tempMatrixObjectNC = *tempMatrixObjectNNS;
     
-    
-    
-    double* matrixAtArea;
-    double SSD;
-    double NC;
+    //Can also be done with assignment operator
+    //MatchImage* tempMatrixObjectNC = tempMatrixObjectNNS;
 
-    cout << "Searching for Wally..." << endl;
-    
+    cout << "Searching for Wally..." << endl << endl;
 
-    
+    //Main loop for running through the cluttered scene
     for(int rowCount = 0; rowCount < clutteredRows - wallyRows; rowCount++){
         for(int colCount = 0; colCount < clutteredCols - wallyCols; colCount++){
             
                 //printProgress(rowCount, colCount, clutteredCols, clutteredRows);
 
-                //Get 1D array of the scene
+                //Get 1D array of the scene area
                 matrixAtArea = sceneImage->getMatrixArea(rowCount, colCount, wallyRows, wallyCols);
             
-                //Workout SSD of scene area
+                //Workout SSD of the scene area
                 SSD = sceneImage->workoutSSD(wallyMatrixArea, matrixAtArea, wallyRows, wallyCols);
             
-                //Workout NC of scene area
+                //Workout NC of the scene area
                 NC = sceneImage->workoutNC(wallyMatrixArea, matrixAtArea, wallyRows, wallyCols);
             
                 //Delete Matrix Area
-                delete[] matrixAtArea;
+                delete [] matrixAtArea;
             
-                //Set Objects if first square
+                //Set initial objects if at the first row and col
                 if(rowCount == 0 && colCount == 0){
                     tempMatrixObjectNNS->setStartingCol(colCount);
                     tempMatrixObjectNNS->setStartingRow(rowCount);
@@ -136,12 +124,11 @@ int main() {
                 }
             
             
-                //Check if new SSD is smaller than what's stored in the current object, if it is then override the object, else continue
+                //Check if new SSD is smaller than what's stored in the current object, if it is then override the object, else the loop continues
                 if(SSD < tempMatrixObjectNNS->getSSD()){
                     tempMatrixObjectNNS->setSSD(SSD);
                     tempMatrixObjectNNS->setStartingRow(rowCount);
                     tempMatrixObjectNNS->setStartingCol(colCount);
-                        
                 }
             
                 if(NC > tempMatrixObjectNC.getNC()){
@@ -157,9 +144,11 @@ int main() {
         
     }
     
-    cout << "Comparisons: " << comparisons << endl;
+    delete [] wallyMatrixArea;
+    
+    cout << "Comparisons: " << comparisons << endl << endl;
 
-  
+        //Edit the cluttered scene inputs to where the program thinks Wally is at
         cluttered_scene_input_data_NNS = sceneImage->draw(tempMatrixObjectNNS->getStartingRow(), tempMatrixObjectNNS->getStartingCol(), cluttered_scene_input_data_NNS, wallyRows, wallyCols, clutteredCols);
     
         cluttered_scene_input_data_NC = sceneImage->draw(tempMatrixObjectNC.getStartingRow(), tempMatrixObjectNC.getStartingCol(), cluttered_scene_input_data_NC, wallyRows, wallyCols, clutteredCols);
@@ -167,26 +156,29 @@ int main() {
         //Write out the new scene showing where wally is. Q = 255 for greyscale images and 1 for binary images.
         int Q = 255;
     
-        string outputFileName_NNS = "SSD_result.pgm";
-        string outputFileName_NC = "NC_result.pgm";
-        string outputFileName_test = "test_result.pgm";
+        //Output filenames
+        string outputFileName_NNS = "SSD_result.pgm", outputFileName_NC = "NC_result.pgm";
     
+        //Actually write data to the files
         WritePGM(outputFileName_NNS, cluttered_scene_input_data_NNS, clutteredRows, clutteredCols, Q);
-    
         WritePGM(outputFileName_NC, cluttered_scene_input_data_NC, clutteredRows, clutteredCols, Q);
     
-        cout << "Processing Complete." << endl;
+        //Delete objects
+        delete [] cluttered_scene_input_data_NNS;
+   
+        delete [] cluttered_scene_input_data_NC;
 
+        delete [] wally_input_data;
+  
+        delete wallyImage;
+  
+        delete sceneImage;
     
-    //Delete objects
-    delete[] cluttered_scene_input_data_NNS;
-    
-
-    delete[] cluttered_scene_input_data_NC;
-    delete wallyImage;
-    delete sceneImage;
+        delete tempMatrixObjectNNS;
     
     
+    cout << "Processing complete!" << endl << endl;
+        
     return 0;
 }
 

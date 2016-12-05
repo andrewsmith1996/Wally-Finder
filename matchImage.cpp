@@ -28,10 +28,37 @@ MatchImage::MatchImage(){
 }
 
 //Copy Constructor
-MatchImage::MatchImage(const Matrix& temp){
-    cout << "Copy Constructor called!" << endl;
-    matrixArray = temp.getMatrixArray();
+MatchImage::MatchImage(const MatchImage& temp){
+    rows = 49;
+    cols = 36;
+    
+    matrixArray = new double*[rows];
+    
+    for(int i = 0; i < rows; ++i){
+        matrixArray[i] = new double[cols];
+        for(int j = 0; j < cols; ++j){
+            matrixArray[i][j] = temp.getMatrixArray()[i][j];
+        }
+    }
+    
 }
+
+//Assignment operator
+MatchImage* MatchImage::operator=(const MatchImage& previousMatrix){
+   
+    matrixArray = new double*[rows];
+    
+    for(int i = 0; i < rows; ++i){
+        matrixArray[i] = new double[cols];
+        for(int j = 0; j < cols; ++j){
+            matrixArray[i][j] = previousMatrix.getMatrixArray()[i][j];
+        }
+    }
+    
+    return this;
+}
+
+
 
 
 int MatchImage::getStartingRow(){

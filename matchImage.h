@@ -22,7 +22,10 @@ class MatchImage : public Matrix{
     MatchImage(int cols, int rows):Matrix(cols, rows){}
     
     //Copy constructor
-    MatchImage(const Matrix& temp);
+    MatchImage(const MatchImage& temp);
+    
+    //Assignment Operator
+    MatchImage* operator=(const MatchImage& other);
     
     int getStartingRow();
     int getStartingCol();

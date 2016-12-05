@@ -24,7 +24,9 @@ class Matrix{
          Matrix(int numRows, int numCols);
     
         //Deconstructor for Matrix
-        ~Matrix();
+         ~Matrix();
+    
+      
     
         //Print whole Matrix
         void printMatrix();

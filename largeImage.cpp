@@ -13,19 +13,17 @@ using namespace std;
 
 double* LargeImage::draw(int finalRow, int finalCol, double* cluttered_scene_input_data, int wallyRows, int wallyCols, int clutteredCols){
     
-    cout << "Drawing Wally Area now..." << endl;
-
     for(int rowCount = finalRow; rowCount <= finalRow + wallyRows; rowCount++){
         for(int colCount = finalCol; colCount <= finalCol + wallyCols; colCount++){
             
             if(rowCount == finalRow || rowCount == finalRow + wallyRows){
-                for(int x = 0; x < 3; x++){
+                for(int x = 0; x < 4; x++){
                     cluttered_scene_input_data[clutteredCols * (rowCount - x) + (colCount - x)] = 0;
                 }
             }
             
             if(colCount == finalCol || colCount == finalCol + wallyCols){
-                for(int x = 0; x < 3; x++){
+                for(int x = 0; x < 4; x++){
                     cluttered_scene_input_data[clutteredCols * (rowCount - x) + (colCount - x)] = 0;
                 }
             }
