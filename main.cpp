@@ -57,24 +57,26 @@ int main() {
     double* wally_input_data = 0;
     double* matrixAtArea;
    
-    //input_data to hold the colour codes of the text files
+    //input_data arrays to hold the colour codes of the text files being imported
     cluttered_scene_input_data_SSD = readTXT(inputFileName, clutteredRows, clutteredCols);
     cluttered_scene_input_data_NC = readTXT(inputFileName, clutteredRows, clutteredCols);
     wally_input_data = readTXT(wallyInputFileName, wallyRows, wallyCols);
     
-    //Sets the colour codes to the Matrix for the cluttered scene, also resets the value count
+    //Sets the colour codes to the Matrix for the read in text files, now the class objects contain the colour codes in 2D array format
     convertPixels(wallyRows, wallyCols, wally_input_data, wallyImage);
     convertPixels(clutteredRows, clutteredCols, cluttered_scene_input_data_SSD, sceneImage);
     convertPixels(clutteredRows, clutteredCols, cluttered_scene_input_data_NC, sceneImage);
     
+    //Delete the date
     delete [] wally_input_data;
     
-    //1D Array that now contain the Matrix of the Wally image
+    //Retrieve the Wally image values into a 1D Array
     double* wallyMatrixArea = wallyImage->getMatrixArea(0, 0, wallyRows, wallyCols);
     
+    //Delete Wally object now the Wally data is in the array
     delete wallyImage;
 
-    //Create the temporary objects using a copy constructor
+    //Create the temporary objects for the comparisons, using a copy constructor
     MatchImage* tempMatrixObjectSSD = new MatchImage();
     MatchImage tempMatrixObjectNC = *tempMatrixObjectSSD;
     
@@ -83,10 +85,10 @@ int main() {
     //MatchImage* tempMatrixObjectNC = tempMatrixObjectSSD;
     //*  *  *  *  *  * NOTE  *  *  *  *  *  *  *
 
-    //Prepares the basic variales for the main loop
+    //Prepares the basic variables for the main loop
     int algorithmChoice = getAlgorithm(), area = getSearchArea(), thresholdCols, thresholdRows;
     
-    //Assign the threshold variables for searching the image
+    //Assign the threshold variables for searching the image, based on the user's choice
     switch(area){
         case 1:
             thresholdRows = wallyRows / 3;
@@ -106,11 +108,11 @@ int main() {
     
     std::cout << "Searching for Wally..." << std::endl << std::endl;
     
-    //Main loop for running through the scene
+    //Main loop for running through the scene and calculating the similarity values
     for(int rowCount = 0; rowCount < clutteredRows - wallyRows; rowCount = rowCount + thresholdRows){
         for(int colCount = 0; colCount < clutteredCols - wallyCols; colCount = colCount + thresholdCols){
 
-                //Get 1D array of the scene area
+                //Get 1D array of the scene area vcolour values
                 matrixAtArea = sceneImage->getMatrixArea(rowCount, colCount, wallyRows, wallyCols);
             
                 //Run the search algorithm on the retrieved Matrix area
@@ -125,7 +127,7 @@ int main() {
                 //Delete Matrix Area ready for next use
                 delete [] matrixAtArea;
             
-                //Set initial objects if the main loop is at the first row and col
+                //Set initial objects variables if the main loop is at the first row and col
                 if(rowCount == 0 && colCount == 0){
                     if(algorithmChoice == 1){
                         tempMatrixObjectSSD->setStartingCol(colCount);
@@ -176,7 +178,7 @@ int main() {
         //Write out the new scene showing where wally is. Q = 255 for greyscale images and 1 for binary images.
         const int Q = 255;
     
-        //Output filenames
+        //Declare output filenames
         const std::string outputFileName_SSD = "SSD_result.pgm", outputFileName_NC = "NC_result.pgm";
     
         //Actually write data to the files
@@ -190,18 +192,18 @@ int main() {
         delete [] cluttered_scene_input_data_SSD;
         delete [] cluttered_scene_input_data_NC;
     
-        //Stringstream output
+        //Stringstream output to the user
         std::ostringstream output;
         output << "Search completed." << std::endl << comparisons << " subimages have been compared." << " I've drawn a black box around where I think Wally is. Your result is stored in the image file";
     
-        //Append correct filename
+        //Append correct filename to the stringstream
         if(algorithmChoice == 1){
             output << " 'SSD_result.pgm'.";
         } else{
             output << " 'NC_result.pgm'.";
         }
     
-        //Output stringstream output
+        //Output stringstream message
         std::cout << output.str() << std::endl << std::endl;
     
         return 0;
@@ -291,15 +293,17 @@ int getAlgorithm(){
                 std::cout << "2 - Normalised Correlation" << std::endl;
                 std::cout << "-----------------------------------------------------------------------------" << std::endl;
             
+                //Take user input
                 std::cin >> algorithmChoice;
             
+                //Condition to test whether the input is out of bounds
                 if((algorithmChoice != 1) && (algorithmChoice != 2)){
                     throw 1;
                 } else{
                     throw 2;
                 }
             
-        //Catch error message
+        //Catch error message and process it, break the loop if it's valid
         } catch(int errorNumber){
             if(errorNumber == 1){
                 std::cout << "Invalid Input! Please try again" << std::endl;
@@ -320,6 +324,7 @@ int getSearchArea(){
     
     bool valid = false;
     
+    //Loop to validate user input
     while(valid != true){
         try{
             std::cout << std::endl << "-----------------------------------------------------------------------------" << std::endl;
@@ -329,8 +334,10 @@ int getSearchArea(){
             std::cout << "3 - Whole Image - Pixel by Pixel (max 1 minute)" << std::endl;
             std::cout << "-----------------------------------------------------------------------------" << std::endl;
             
+            //Take user input
             std::cin >> area;
             
+            //Test condition and throw error message based upon this
             if((area != 1) && (area != 2) && (area != 3)){
                 throw 1;
             } else{
@@ -353,7 +360,7 @@ int getSearchArea(){
 void convertPixels(int rows, int cols, double* data, MatchImage*& image){
     int count = 0;
     
-    //Sets the colour codes to the Matrix for the Wally matrix
+    //Sets the colour codes to the Matrix for the cluttered scene matrix by using a member function of the Matrix class
     for(int rowcount = 0; rowcount < rows; rowcount++){
         for(int colcount = 0; colcount < cols; colcount++){
             image->setPixel(rowcount, colcount, data[count]);
@@ -366,7 +373,7 @@ void convertPixels(int rows, int cols, double* data, MatchImage*& image){
 void convertPixels(int rows, int cols, double* data, LargeImage*& image){
     int count = 0;
     
-    //Sets the colour codes to the Matrix for the Wally matrix
+    //Sets the colour codes to the Matrix for the Wally matrix by using a member function of the Matrix class
     for(int rowcount = 0; rowcount < rows; rowcount++){
         for(int colcount = 0; colcount < cols; colcount++){
             image->setPixel(rowcount, colcount, data[count]);
