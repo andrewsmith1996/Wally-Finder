@@ -11,6 +11,7 @@
 
 using namespace std;
 
+//Draws a line 4 pixels around Wally
 double* LargeImage::draw(int finalRow, int finalCol, double* cluttered_scene_input_data, int wallyRows, int wallyCols, int clutteredCols){
     
     for(int rowCount = finalRow; rowCount <= finalRow + wallyRows; rowCount++){

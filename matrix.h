@@ -26,8 +26,6 @@ class Matrix{
         //Deconstructor for Matrix
          ~Matrix();
     
-      
-    
         //Print whole Matrix
         void printMatrix();
  
@@ -41,21 +39,13 @@ class Matrix{
         double workoutSSD(double* wallyMatrix, double* sceneMatrix, int wallyRows, int wallyCols);
         double workoutNC(double* wallyMatrix, double* sceneMatrix, int wallyRows, int wallyCols);
     
-        
-    
         void setSSD(double NNSscore);
-    
         double getSSD();
     
         void setNC(double NCscore);
-    
         double getNC();
     
         double ** getMatrixArray() const;
-    
-        
-    
-
 
     protected:
     

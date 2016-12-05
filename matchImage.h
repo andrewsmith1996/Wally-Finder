@@ -11,7 +11,6 @@
 
 #include <stdio.h>
 #include "matrix.h"
-#include "largeImage.h"
 
 class MatchImage : public Matrix{
     public:
@@ -37,9 +36,6 @@ protected:
     
     int startingRow;
     int startingCol;
-  
-
-
 
 };
 

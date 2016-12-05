@@ -42,7 +42,7 @@ Matrix::Matrix(int numRows, int numCols){
 }
 
 
-
+//Destructor for Matrix
 Matrix::~Matrix(){
 
     //Delete elements in array
@@ -51,17 +51,16 @@ Matrix::~Matrix(){
     }
     
     //Delete whole Matrix array
-    delete[] matrixArray;
+    delete [] matrixArray;
         
 }
 
-
+//Returns a pointer to a 1D array of the Matrix Area
 double* Matrix::getMatrixArea(int row, int col, int numberRows, int numberCols){
   
     double* matrixArea = new double[numberRows * numberCols];
     
     int count = 0;
-    
     
     for(int rowcount = row; rowcount < row + numberRows; rowcount++){
         for(int colcount = col; colcount < col + numberCols; colcount++){
@@ -74,17 +73,18 @@ double* Matrix::getMatrixArea(int row, int col, int numberRows, int numberCols){
     
 }
 
+//Returns the Matrix array
 double** Matrix::getMatrixArray() const{
     return matrixArray;
 }
 
-
+//Sets the pixel in the Matrix Array
 void Matrix::setPixel(int row, int col, int code){
         matrixArray[row][col] = code;
     
 }
 
-
+//Calculates the SSD for a big image and a sub image, disregarding white pixels
 double Matrix::workoutSSD(double* wallyMatrix, double* sceneMatrix, int wallyRows, int wallyCols){
     
     double SSD = 0.0, diff = 0.0;
@@ -99,10 +99,10 @@ double Matrix::workoutSSD(double* wallyMatrix, double* sceneMatrix, int wallyRow
     return SSD;
 }
 
-
+//Calculates the Normalised Correlation of a big image and a sub image
 double Matrix::workoutNC(double* wallyMatrix, double* sceneMatrix, int wallyRows, int wallyCols){
  
-    double pixelTotalScene = 0.0, pixelTotalWally = 0.0, NC = 0.0, meanOfWally = 0.0, meanOfScene = 0.0, topLine = 0.0, leftSide = 0.0, rightSide = 0.0;
+    double pixelTotalScene = 0.0, pixelTotalWally = 0.0, NC = 0.0, meanOfWally = 0.0, meanOfScene = 0.0, topLine = 0.0;
     
     //Deep copy of wallyMatrix to a new temp wallyMatrix so the original isn't overwritten via the pointer
     double* tempWallyMatrix = new double[wallyRows * wallyCols];
@@ -121,18 +121,13 @@ double Matrix::workoutNC(double* wallyMatrix, double* sceneMatrix, int wallyRows
     meanOfWally = (1 / (wallyRows * wallyCols)) * pixelTotalWally;
     meanOfScene = (1 / (wallyRows * wallyCols)) * pixelTotalScene;
 
-    //Take away mean from each pixel
+    //Take away mean from each pixel and multiply them
     for(int y = 0; y < wallyRows * wallyCols; y++){
             tempWallyMatrix[y] -= meanOfWally;
             sceneMatrix[y] -= meanOfScene;
-        
+            topLine += sceneMatrix[y] * tempWallyMatrix[y];
     }
     
-    //Get sum of each pixel multiplied by each pixel
-    for(int y = 0; y < wallyRows * wallyCols; y++){
-            topLine += sceneMatrix[y] * tempWallyMatrix[y];
-            
-    }
     
     delete[] tempWallyMatrix;
 
@@ -157,17 +152,17 @@ void Matrix::printMatrix(){
     }
 }
 
-
+//Return the SSD of the object
 double Matrix::getSSD(){
     return SSD;
 }
 
-//Method to set the NNS score of the matrix
+//Method to set the SSD score of the matrix
 void Matrix::setSSD(double NNSscore){
     SSD = NNSscore;
 }
 
-
+//Returns the NC of the object
 double Matrix::getNC(){
     return NC;
 }
