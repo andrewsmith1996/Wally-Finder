@@ -7,10 +7,8 @@
 //
 
 #include "matchImage.h"
-#include "largeImage.h";
+#include "largeImage.h"
 #include <iostream>
-
-using namespace std;
 
 //Default constructor when not using the specified constructor
 MatchImage::MatchImage(){

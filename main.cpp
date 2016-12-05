@@ -6,13 +6,10 @@
 //  Copyright © 2016 Andrew Smith. All rights reserved.
 //
 
-#include <array>
 #include <iostream>
-
 #include <sstream> // stringstream
 #include <fstream> // ifstream
 #include <istream>
-#include <vector>
 #include <algorithm>
 #include <string>
 
@@ -20,16 +17,13 @@
 #include "matchImage.h"
 #include "largeImage.h"
 
-
-using namespace std;
-
 //Prototypes
 
 //Reads .txt file and converts it to a 1D array of doubles of size R*C
-double* readTXT(string fileName, int sizeR, int sizeC);
+double* readTXT(std::string fileName, int sizeR, int sizeC);
 
 //Converts 1D array of doubles to .pgm image. Use Q = 255 for greyscale images and Q=1 for binary images.
-void WritePGM(string filename, double *data, int sizeR, int sizeC, int Q);
+void WritePGM(std::string filename, double *data, int sizeR, int sizeC, int Q);
 
 //Gets the search algorithm choice from the user
 int getAlgorithm();
@@ -55,7 +49,7 @@ int main() {
     LargeImage* sceneImage = new LargeImage(clutteredRows, clutteredCols);
     
     //File names for reading in the images from the text files
-    const string inputFileName = "Cluttered_scene.txt", wallyInputFileName = "Wally_Grey.txt";
+    const std::string inputFileName = "Cluttered_scene.txt", wallyInputFileName = "Wally_Grey.txt";
     
     //Creates pointers to 1D arrays of doubles read in from the text files
     double* cluttered_scene_input_data_SSD = 0;
@@ -84,9 +78,8 @@ int main() {
     MatchImage* tempMatrixObjectSSD = new MatchImage();
     MatchImage tempMatrixObjectNC = *tempMatrixObjectSSD;
     
-    
     //*  *  *  *  *  * NOTE  *  *  *  *  *  *  *
-    //Can also be done with this assignment operator overload by uncommenting the following line and changing the pointer functions from . to ->
+    //^This process can also be done with this assignment operator overload by uncommenting the next line & changing the pointer functions from . to ->
     //MatchImage* tempMatrixObjectNC = tempMatrixObjectSSD;
     //*  *  *  *  *  * NOTE  *  *  *  *  *  *  *
 
@@ -108,10 +101,10 @@ int main() {
             thresholdRows = 1;
             break;
         default:
-            cout << "ERROR - Please Restart the Program" << endl;
+            std::cout << "ERROR setting the threshold rows and columns - Please Restart the Program" << std::endl;
     }
     
-    cout << "Searching for Wally..." << endl << endl;
+    std::cout << "Searching for Wally..." << std::endl << std::endl;
     
     //Main loop for running through the scene
     for(int rowCount = 0; rowCount < clutteredRows - wallyRows; rowCount = rowCount + thresholdRows){
@@ -124,12 +117,10 @@ int main() {
                 if(algorithmChoice == 1){
                     //Workout SSD of the scene area
                     SSD = sceneImage->workoutSSD(wallyMatrixArea, matrixAtArea, wallyRows, wallyCols);
-                    
                 } else{
                     //Workout NC of the scene area
                     NC = sceneImage->workoutNC(wallyMatrixArea, matrixAtArea, wallyRows, wallyCols);
                 }
-            
             
                 //Delete Matrix Area ready for next use
                 delete [] matrixAtArea;
@@ -163,7 +154,7 @@ int main() {
                     }
                 }
             
-                //Update the number of comparisons
+                //Increase the number of comparisons
                 comparisons++;
             }
         }
@@ -178,6 +169,7 @@ int main() {
             cluttered_scene_input_data_NC = sceneImage->draw(tempMatrixObjectNC.getStartingRow(), tempMatrixObjectNC.getStartingCol(), cluttered_scene_input_data_NC, wallyRows, wallyCols, clutteredCols);
         }
     
+        //Delete the objects
         delete sceneImage;
         delete tempMatrixObjectSSD;
     
@@ -185,7 +177,7 @@ int main() {
         const int Q = 255;
     
         //Output filenames
-        const string outputFileName_SSD = "SSD_result.pgm", outputFileName_NC = "NC_result.pgm";
+        const std::string outputFileName_SSD = "SSD_result.pgm", outputFileName_NC = "NC_result.pgm";
     
         //Actually write data to the files
         if(algorithmChoice == 1){
@@ -199,8 +191,8 @@ int main() {
         delete [] cluttered_scene_input_data_NC;
     
         //Stringstream output
-        ostringstream output;
-        output << "Search completed." << endl << comparisons << " subimages have been compared." << " I've drawn a black box around where I think Wally is. Your result is stored in the image file";
+        std::ostringstream output;
+        output << "Search completed." << std::endl << comparisons << " subimages have been compared." << " I've drawn a black box around where I think Wally is. Your result is stored in the image file";
     
         //Append correct filename
         if(algorithmChoice == 1){
@@ -210,22 +202,22 @@ int main() {
         }
     
         //Output stringstream output
-        cout << output.str() << endl << endl;
+        std::cout << output.str() << std::endl << std::endl;
     
         return 0;
 }
 
 
 // Read .txt file with image of size RxC, and convert to an array of doubles
-double* readTXT(string fileName, int sizeR, int sizeC){
+double* readTXT(std::string fileName, int sizeR, int sizeC){
     
     //Data Array - 1D Array of doubles
     double* data = new double[sizeR*sizeC];
    
     int i = 0;
    
-    ifstream myfile;
-    myfile.open(fileName, ios::in);
+    std::ifstream myfile;
+    myfile.open(fileName, std::ios::in);
    
     if (myfile.is_open()){
         
@@ -233,7 +225,7 @@ double* readTXT(string fileName, int sizeR, int sizeC){
             //If I reaches the end of the Matrix
             if (i>sizeR*sizeC-1) break;
             myfile >> *(data+i);
-            //cout << *(data+i) << ' '; // This line display the converted data on the screen, you may comment it out.
+            //std::std::cout << *(data+i) << ' '; // This line display the converted data on the screen, you may comment it out.
             i++;
         }
         
@@ -241,19 +233,19 @@ double* readTXT(string fileName, int sizeR, int sizeC){
     }
     
     else{
-        cout << "Unable to open file" << endl;
+        std::cout << "Unable to open file" << std::endl;
     }
     
     return data;
 }
 
 // convert data from double to .pgm stored in filename
-void WritePGM(string filename, double *data, int sizeR, int sizeC, int Q){
+void WritePGM(std::string filename, double *data, int sizeR, int sizeC, int Q){
     
     int i;
     unsigned char *image;
     
-    ofstream myfile;
+    std::ofstream myfile;
     
     image = (unsigned char *) new unsigned char [sizeR*sizeC];
     
@@ -262,21 +254,21 @@ void WritePGM(string filename, double *data, int sizeR, int sizeC, int Q){
     for(i=0; i<sizeR*sizeC; i++)
         image[i]=(unsigned char)data[i];
     
-    myfile.open(filename, ios::out|ios::binary|ios::trunc);
+    myfile.open(filename, std::ios::out|std::ios::binary|std::ios::trunc);
     
     if (!myfile) {
-        cout << "Can't open file: " << filename << endl;
+        std::cout << "Can't open file: " << filename << std::endl;
         exit(1);
     }
     
-    myfile << "P5" << endl;
-    myfile << sizeC << " " << sizeR << endl;
-    myfile << Q << endl;
+    myfile << "P5" << std::endl;
+    myfile << sizeC << " " << sizeR << std::endl;
+    myfile << Q << std::endl;
     
     myfile.write( reinterpret_cast<char *>(image), (sizeR*sizeC)*sizeof(unsigned char));
     
     if (myfile.fail()) {
-        cout << "Can't write image " << filename << endl;
+        std::cout << "Can't write image " << filename << std::endl;
         exit(0);
     }
     
@@ -293,13 +285,13 @@ int getAlgorithm(){
     //Error Handling loop to validate input
     while(valid != true){
         try{
-                cout << "-----------------------------------------------------------------------------" << endl;
-                cout << "Please select which Search Algorithm to use" << endl;
-                cout << "1 - Sum of Squared Differences" << endl;
-                cout << "2 - Normalised Correlation" << endl;
-                cout << "-----------------------------------------------------------------------------" << endl;
+                std::cout << "-----------------------------------------------------------------------------" << std::endl;
+                std::cout << "Please select which Image Search Algorithm to use" << std::endl;
+                std::cout << "1 - Sum of Squared Differences" << std::endl;
+                std::cout << "2 - Normalised Correlation" << std::endl;
+                std::cout << "-----------------------------------------------------------------------------" << std::endl;
             
-                cin >> algorithmChoice;
+                std::cin >> algorithmChoice;
             
                 if((algorithmChoice != 1) && (algorithmChoice != 2)){
                     throw 1;
@@ -310,7 +302,7 @@ int getAlgorithm(){
         //Catch error message
         } catch(int errorNumber){
             if(errorNumber == 1){
-                cout << "Invalid Input! Please try again" << endl;
+                std::cout << "Invalid Input! Please try again" << std::endl;
             } else{
                 valid = true;
             }
@@ -330,24 +322,23 @@ int getSearchArea(){
     
     while(valid != true){
         try{
-            cout << endl << "-----------------------------------------------------------------------------" << endl;
-            cout << "Please select which how to search the image" << endl;
-            cout << "1 - Small Area (Sub-image rows / 2 & sub-image rows / 3) (fastest)" << endl;
-            cout << "2 - Medium Area of Sub-image (Sub-image rows / 2 & sub-image rows / 2) (medium speed)" << endl;
-            cout << "3 - Whole Area (Pixel by Pixel) (slow)" << endl;
-            cout << "-----------------------------------------------------------------------------" << endl;
+            std::cout << std::endl << "-----------------------------------------------------------------------------" << std::endl;
+            std::cout << "Please select which how to search the image" << std::endl;
+            std::cout << "1 - Small Sub-Image - Rows / 3 & Cols / 2) (max 2 second)" << std::endl;
+            std::cout << "2 - Medium Sub-Image - Rows / 2 & Cols / 2) (max 3 seconds)" << std::endl;
+            std::cout << "3 - Whole Image - Pixel by Pixel (max 1 minute)" << std::endl;
+            std::cout << "-----------------------------------------------------------------------------" << std::endl;
             
-            cin >> area;
+            std::cin >> area;
             
             if((area != 1) && (area != 2) && (area != 3)){
                 throw 1;
             } else{
                 throw 2;
             }
-            
         } catch(int errorNumber){
             if(errorNumber == 1){
-                cout << "Invalid Input! Please try again" << endl;
+                std::cout << "Invalid Input! Please try again" << std::endl;
             } else{
                 valid = true;
             }

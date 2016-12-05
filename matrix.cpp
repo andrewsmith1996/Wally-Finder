@@ -5,7 +5,6 @@
 //  Created by Andrew Smith on 13/11/2016.
 //  Copyright © 2016 Andrew Smith. All rights reserved.
 //
-using namespace std;
 
 #include <iostream>
 #include "matrix.h"
@@ -164,9 +163,9 @@ void Matrix::printMatrix(){
     
     for(int row = 0; row < rows; row++){
         for(int col = 0; col < cols; col++){
-            cout << matrixArray[row][col] << " ";
+            std::cout << matrixArray[row][col] << " ";
         }
-        cout << "\n";
+        std:: cout << "\n";
        
     }
 }

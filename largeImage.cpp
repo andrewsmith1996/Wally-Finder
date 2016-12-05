@@ -9,8 +9,6 @@
 #include "largeImage.h"
 #include <iostream>
 
-using namespace std;
-
 LargeImage::LargeImage(){
     rows = 1;
     cols = 1;

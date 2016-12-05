@@ -12,8 +12,6 @@
 #include <stdio.h>
 #include <array>
 
-using namespace std;
-
 //Main Matrix Class
 
 class Matrix{
