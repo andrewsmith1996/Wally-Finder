@@ -6,6 +6,13 @@
 //  Copyright © 2016 Andrew Smith. All rights reserved.
 //
 
+//Try and Catch
+//Structs?
+//Template
+//Rules
+
+
+
 #include <array>
 #include <iostream>
 
@@ -37,18 +44,25 @@ int getAlgorithm();
 //Gets how the user wants to search the image
 int getSearchArea();
 
+//Function for converting the pixels from the file images into the objects
+void convertPixels(int rows, int cols, double* data, MatchImage* image);
+
+//Overloaded function for the convertPixels function
+void convertPixels(int rows, int cols, double* data, LargeImage* image);
+
 int main() {
     
-    //M and N represent the number of rows and columns in the image. Cluttered_scene, M = 768, N = 1024, Wally_grey, M = 49, N =  36
-    int clutteredRows = 768, clutteredCols = 1024, wallyRows = 49, wallyCols = 36, comparisons = 0, count = 0;
+    //M and N represent the number of rows and columns in the image
+    const int clutteredRows = 768, clutteredCols = 1024, wallyRows = 49, wallyCols = 36;
+    int comparisons = 0;
     double SSD, NC;
     
-    //Initiate the Matrices
+    //Initiate the Matrices from the classes
     MatchImage* wallyImage = new MatchImage();
     LargeImage* sceneImage = new LargeImage(clutteredRows, clutteredCols);
     
     //File names for reading in the images from the text files
-    string inputFileName = "Cluttered_scene.txt", wallyInputFileName = "Wally_Grey.txt";
+    const string inputFileName = "Cluttered_scene.txt", wallyInputFileName = "Wally_Grey.txt";
     
     //Creates pointers to 1D arrays of doubles read in from the text files
     double* cluttered_scene_input_data_SSD = 0;
@@ -61,28 +75,12 @@ int main() {
     cluttered_scene_input_data_NC = readTXT(inputFileName, clutteredRows, clutteredCols);
     wally_input_data = readTXT(wallyInputFileName, wallyRows, wallyCols);
     
-    
-    //Sets the colour codes to the Matrix for the Wally matrix
-    for(int rowcount = 0; rowcount < wallyRows; rowcount++){
-        for(int colcount = 0; colcount < wallyCols; colcount++){
-            wallyImage->setPixel(rowcount, colcount, wally_input_data[count]);
-            count++;
-        }
-    }
+    //Sets the colour codes to the Matrix for the cluttered scene, also resets the value count
+    convertPixels(wallyRows, wallyCols, wally_input_data, wallyImage);
+    convertPixels(clutteredRows, clutteredCols, cluttered_scene_input_data_SSD, sceneImage);
+    convertPixels(clutteredRows, clutteredCols, cluttered_scene_input_data_NC, sceneImage);
     
     delete [] wally_input_data;
-    
-    
-    //Sets the colour codes to the Matrix for the cluttered scene, also resets the value count
-    count = 0;
-    for(int rowcount = 0; rowcount < clutteredRows; rowcount++){
-        for(int colcount = 0; colcount < clutteredCols; colcount++){
-            sceneImage->setPixel(rowcount, colcount, cluttered_scene_input_data_SSD[count]);
-            sceneImage->setPixel(rowcount, colcount, cluttered_scene_input_data_NC[count]);
-            count++;
-        }
-    }
-    
     
     //1D Array that now contain the Matrix of the Wally image
     double* wallyMatrixArea = wallyImage->getMatrixArea(0, 0, wallyRows, wallyCols);
@@ -94,10 +92,10 @@ int main() {
     MatchImage tempMatrixObjectNC = *tempMatrixObjectSSD;
     
     
-    //*  *  *  *  *  *  *  *  *  *  *  *  *
+    //*  *  *  *  *  * NOTE  *  *  *  *  *  *  *
     //Can also be done with this assignment operator overload by uncommenting the following line and changing the pointer functions from . to ->
     //MatchImage* tempMatrixObjectNC = tempMatrixObjectSSD;
-    //*  *  *  *  *  *  *  *  *  *  *  *  *
+    //*  *  *  *  *  * NOTE  *  *  *  *  *  *  *
 
     //Prepares the basic variales for the main loop
     int algorithmChoice = getAlgorithm(), area = getSearchArea(), thresholdCols, thresholdRows;
@@ -179,8 +177,6 @@ int main() {
     
         //Delete the Wally Matrix area upon completion of the program
         delete [] wallyMatrixArea;
-    
-        cout << comparisons << " subimages have been compared." << endl << endl;;
 
         //Edit the cluttered scene inputs to where the program thinks Wally is at
         if(algorithmChoice == 1){
@@ -193,10 +189,10 @@ int main() {
         delete tempMatrixObjectSSD;
     
         //Write out the new scene showing where wally is. Q = 255 for greyscale images and 1 for binary images.
-        int Q = 255;
+        const int Q = 255;
     
         //Output filenames
-        string outputFileName_SSD = "SSD_result.pgm", outputFileName_NC = "NC_result.pgm";
+        const string outputFileName_SSD = "SSD_result.pgm", outputFileName_NC = "NC_result.pgm";
     
         //Actually write data to the files
         if(algorithmChoice == 1){
@@ -209,14 +205,18 @@ int main() {
         delete [] cluttered_scene_input_data_SSD;
         delete [] cluttered_scene_input_data_NC;
     
-        cout << "Search completed. I've drawn a black box around where I think Wally is. Your result is stored in the image file ";
+        //Stringstream output
+        ostringstream output;
+        output << "Search completed." << endl << comparisons << " subimages have been compared." << " I've drawn a black box around where I think Wally is. Your result is stored in the image file";
     
         if(algorithmChoice == 1){
-            cout << " 'SSD_result.pgm'." << endl << endl;
+            output << " 'SSD_result.pgm'.";
         } else{
-            cout << " 'NC_result.pgm'." << endl << endl;
+            output << " 'NC_result.pgm'.";
         }
-        
+    
+        cout << output.str() << endl << endl;
+    
         return 0;
 }
 
@@ -336,5 +336,30 @@ int getSearchArea(){
     
     return area;
 }
+
+void convertPixels(int rows, int cols, double* data, MatchImage* image){
+    int count = 0;
+    //Sets the colour codes to the Matrix for the Wally matrix
+    for(int rowcount = 0; rowcount < rows; rowcount++){
+        for(int colcount = 0; colcount < cols; colcount++){
+            image->setPixel(rowcount, colcount, data[count]);
+            count++;
+        }
+    }
+    
+}
+
+void convertPixels(int rows, int cols, double* data, LargeImage* image){
+    int count = 0;
+    //Sets the colour codes to the Matrix for the Wally matrix
+    for(int rowcount = 0; rowcount < rows; rowcount++){
+        for(int colcount = 0; colcount < cols; colcount++){
+            image->setPixel(rowcount, colcount, data[count]);
+            count++;
+        }
+    }
+    
+}
+
 
 
