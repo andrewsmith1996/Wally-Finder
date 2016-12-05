@@ -41,6 +41,22 @@ Matrix::Matrix(int numRows, int numCols){
     }
 }
 
+//Assignment operator for creating identical Matrices
+Matrix* Matrix::operator=(const Matrix& previousMatrix){
+    
+    matrixArray = new double*[rows];
+    
+    for(int i = 0; i < rows; ++i){
+        matrixArray[i] = new double[cols];
+        for(int j = 0; j < cols; ++j){
+            matrixArray[i][j] = previousMatrix.getMatrixArray()[i][j];
+        }
+    }
+    
+    return this;
+}
+
+
 
 //Destructor for Matrix
 Matrix::~Matrix(){
@@ -57,11 +73,12 @@ Matrix::~Matrix(){
 
 //Returns a pointer to a 1D array of the Matrix Area
 double* Matrix::getMatrixArea(int row, int col, int numberRows, int numberCols){
-  
+    
     double* matrixArea = new double[numberRows * numberCols];
     
     int count = 0;
     
+    //Add the values into the 1D array
     for(int rowcount = row; rowcount < row + numberRows; rowcount++){
         for(int colcount = col; colcount < col + numberCols; colcount++){
                 matrixArea[count] = matrixArray[rowcount][colcount];
@@ -102,10 +119,12 @@ double Matrix::workoutSSD(double* wallyMatrix, double* sceneMatrix, int wallyRow
 //Calculates the Normalised Correlation of a big image and a sub image
 double Matrix::workoutNC(double* wallyMatrix, double* sceneMatrix, int wallyRows, int wallyCols){
  
+    //Set initial variables
     double pixelTotalScene = 0.0, pixelTotalWally = 0.0, NC = 0.0, meanOfWally = 0.0, meanOfScene = 0.0, topLine = 0.0;
     
     //Deep copy of wallyMatrix to a new temp wallyMatrix so the original isn't overwritten via the pointer
     double* tempWallyMatrix = new double[wallyRows * wallyCols];
+    
     for(int ii = 0; ii < wallyRows * wallyCols; ii++){
             tempWallyMatrix[ii] = wallyMatrix[ii];
         
@@ -128,8 +147,8 @@ double Matrix::workoutNC(double* wallyMatrix, double* sceneMatrix, int wallyRows
             topLine += sceneMatrix[y] * tempWallyMatrix[y];
     }
     
-    
-    delete[] tempWallyMatrix;
+    //Delete the array
+    delete [] tempWallyMatrix;
 
     //Compute Normalised Correlation
     NC = topLine / sqrt((pixelTotalWally * pixelTotalWally) * (pixelTotalScene * pixelTotalScene));
@@ -142,7 +161,7 @@ double Matrix::workoutNC(double* wallyMatrix, double* sceneMatrix, int wallyRows
 
 //Method to print the whole Matrix out
 void Matrix::printMatrix(){
-   
+    
     for(int row = 0; row < rows; row++){
         for(int col = 0; col < cols; col++){
             cout << matrixArray[row][col] << " ";

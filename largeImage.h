@@ -14,7 +14,11 @@
 
 class LargeImage : public Matrix{
     public:
+        //Constructor
         LargeImage(int cols, int rows):Matrix(cols, rows){}
+        LargeImage();
+    
+        //Member function to actually draw on the images
         double* draw(int finalRow, int finalCol, double* cluttered_scene_input_data, int wallyRows, int wallyCols, int clutteredCols);
 };
 

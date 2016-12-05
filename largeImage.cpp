@@ -11,9 +11,25 @@
 
 using namespace std;
 
+LargeImage::LargeImage(){
+    rows = 1;
+    cols = 1;
+    
+    matrixArray = new double*[rows];
+    
+    for(int i = 0; i < rows; ++i){
+        matrixArray[i] = new double[cols];
+        for(int j = 0; j < cols; ++j){
+            matrixArray[i][j] = 0.0;
+        }
+    }
+}
+
+
 //Draws a line 4 pixels around Wally
 double* LargeImage::draw(int finalRow, int finalCol, double* cluttered_scene_input_data, int wallyRows, int wallyCols, int clutteredCols){
     
+    //Loop to run through each row and column to edit the data to draw on it
     for(int rowCount = finalRow; rowCount <= finalRow + wallyRows; rowCount++){
         for(int colCount = finalCol; colCount <= finalCol + wallyCols; colCount++){
             
@@ -30,6 +46,7 @@ double* LargeImage::draw(int finalRow, int finalCol, double* cluttered_scene_inp
             }
         }
     }
+    
     return cluttered_scene_input_data;
     
 }

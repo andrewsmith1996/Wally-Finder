@@ -27,7 +27,7 @@ MatchImage::MatchImage(){
     }
 }
 
-//Copy Constructor
+//Copy Constructor for creating identical Matrices
 MatchImage::MatchImage(const MatchImage& temp){
     rows = 49;
     cols = 36;
@@ -43,7 +43,7 @@ MatchImage::MatchImage(const MatchImage& temp){
     
 }
 
-//Assignment operator
+//Assignment operator for creating identical Matrices
 MatchImage* MatchImage::operator=(const MatchImage& previousMatrix){
    
     matrixArray = new double*[rows];
@@ -57,8 +57,6 @@ MatchImage* MatchImage::operator=(const MatchImage& previousMatrix){
     
     return this;
 }
-
-
 
 
 int MatchImage::getStartingRow(){
@@ -77,10 +75,10 @@ void MatchImage::setStartingCol(int col){
     startingCol = col;
 }
 
-void MatchImage::populate(int numberOfRows, int numberOfCols, double** scene){
+void MatchImage::populate(int numberOfRows, int numberOfCols, double** scene, int code){
     for(int rowCount = startingRow; rowCount < startingRow + numberOfRows; rowCount++){
         for(int colCount = startingCol; colCount < startingCol + numberOfCols; colCount++){
-            matrixArray[rowCount][colCount] = matrixArray[rowCount][colCount];
+            matrixArray[rowCount][colCount] = code;
         }
     }
 }

@@ -31,7 +31,9 @@ class MatchImage : public Matrix{
     void setStartingRow(int row);
     void setStartingCol(int col);
     
-    void populate(int numberOfRows, int numberOfCols, double** scene);
+    //Function for overiding the variables in the Matrix
+    void populate(int numberOfRows, int numberOfCols, double** scene, int code);
+    
 protected:
     
     int startingRow;

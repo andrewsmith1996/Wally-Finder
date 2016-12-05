@@ -6,13 +6,6 @@
 //  Copyright © 2016 Andrew Smith. All rights reserved.
 //
 
-//Try and Catch
-//Structs?
-//Template
-//Rules
-
-
-
 #include <array>
 #include <iostream>
 
@@ -45,10 +38,10 @@ int getAlgorithm();
 int getSearchArea();
 
 //Function for converting the pixels from the file images into the objects
-void convertPixels(int rows, int cols, double* data, MatchImage* image);
+void convertPixels(int rows, int cols, double* data, MatchImage*& image);
 
 //Overloaded function for the convertPixels function
-void convertPixels(int rows, int cols, double* data, LargeImage* image);
+void convertPixels(int rows, int cols, double* data, LargeImage*& image);
 
 int main() {
     
@@ -173,7 +166,7 @@ int main() {
                 //Update the number of comparisons
                 comparisons++;
             }
-    }
+        }
     
         //Delete the Wally Matrix area upon completion of the program
         delete [] wallyMatrixArea;
@@ -209,12 +202,14 @@ int main() {
         ostringstream output;
         output << "Search completed." << endl << comparisons << " subimages have been compared." << " I've drawn a black box around where I think Wally is. Your result is stored in the image file";
     
+        //Append correct filename
         if(algorithmChoice == 1){
             output << " 'SSD_result.pgm'.";
         } else{
             output << " 'NC_result.pgm'.";
         }
     
+        //Output stringstream output
         cout << output.str() << endl << endl;
     
         return 0;
@@ -249,14 +244,13 @@ double* readTXT(string fileName, int sizeR, int sizeC){
         cout << "Unable to open file" << endl;
     }
     
-    
     return data;
 }
 
 // convert data from double to .pgm stored in filename
 void WritePGM(string filename, double *data, int sizeR, int sizeC, int Q){
     
-    int i, j;
+    int i;
     unsigned char *image;
     
     ofstream myfile;
@@ -293,52 +287,81 @@ void WritePGM(string filename, double *data, int sizeR, int sizeC, int Q){
 }
 
 int getAlgorithm(){
-    
     int algorithmChoice;
-  
-    do{
-        cout << endl << "-----------------------------------------------------------------------------" << endl;
-        cout << "Please select which Search Algorithm to use" << endl;
-        cout << "1 - Sum of Squared Differences" << endl;
-        cout << "2 - Normalised Correlation" << endl;
-        cout << "-----------------------------------------------------------------------------" << endl;
-        
-        cin >> algorithmChoice;
+    bool valid = false;
     
-        if((algorithmChoice != 1) && (algorithmChoice != 2)){
-            cout << "Invalid Input! Please try again." << endl;
+    //Error Handling loop to validate input
+    while(valid != true){
+        try{
+                cout << "-----------------------------------------------------------------------------" << endl;
+                cout << "Please select which Search Algorithm to use" << endl;
+                cout << "1 - Sum of Squared Differences" << endl;
+                cout << "2 - Normalised Correlation" << endl;
+                cout << "-----------------------------------------------------------------------------" << endl;
+            
+                cin >> algorithmChoice;
+            
+                if((algorithmChoice != 1) && (algorithmChoice != 2)){
+                    throw 1;
+                } else{
+                    throw 2;
+                }
+            
+        //Catch error message
+        } catch(int errorNumber){
+            if(errorNumber == 1){
+                cout << "Invalid Input! Please try again" << endl;
+            } else{
+                valid = true;
+            }
+            
         }
         
-    } while((algorithmChoice != 1) && (algorithmChoice != 2));
+    }
+
     
     return algorithmChoice;
 }
 
 int getSearchArea(){
     int area;
-
-    do{
-        cout << endl << "-----------------------------------------------------------------------------" << endl;
-        cout << "Please select which how to search the image" << endl;
-        cout << "1 - Small Area (Sub-image rows / 2 & sub-image rows / 3) (fastest)" << endl;
-        cout << "2 - Medium Area of Sub-image (Sub-image rows / 2 & sub-image rows / 2) (medium speed)" << endl;
-        cout << "3 - Whole Area (Pixel by Pixel) (slow)" << endl;
-        cout << "-----------------------------------------------------------------------------" << endl;
-        
-        cin >> area;
-        
-        if((area != 1) && (area != 2) && (area != 3)){
-            cout << "Invalid Input! Please try again" << endl;
+    
+    bool valid = false;
+    
+    while(valid != true){
+        try{
+            cout << endl << "-----------------------------------------------------------------------------" << endl;
+            cout << "Please select which how to search the image" << endl;
+            cout << "1 - Small Area (Sub-image rows / 2 & sub-image rows / 3) (fastest)" << endl;
+            cout << "2 - Medium Area of Sub-image (Sub-image rows / 2 & sub-image rows / 2) (medium speed)" << endl;
+            cout << "3 - Whole Area (Pixel by Pixel) (slow)" << endl;
+            cout << "-----------------------------------------------------------------------------" << endl;
+            
+            cin >> area;
+            
+            if((area != 1) && (area != 2) && (area != 3)){
+                throw 1;
+            } else{
+                throw 2;
+            }
+            
+        } catch(int errorNumber){
+            if(errorNumber == 1){
+                cout << "Invalid Input! Please try again" << endl;
+            } else{
+                valid = true;
+            }
+            
         }
 
-        
-    } while((area != 1) && (area != 2) && (area != 3));
+    }
     
     return area;
 }
 
-void convertPixels(int rows, int cols, double* data, MatchImage* image){
+void convertPixels(int rows, int cols, double* data, MatchImage*& image){
     int count = 0;
+    
     //Sets the colour codes to the Matrix for the Wally matrix
     for(int rowcount = 0; rowcount < rows; rowcount++){
         for(int colcount = 0; colcount < cols; colcount++){
@@ -349,8 +372,9 @@ void convertPixels(int rows, int cols, double* data, MatchImage* image){
     
 }
 
-void convertPixels(int rows, int cols, double* data, LargeImage* image){
+void convertPixels(int rows, int cols, double* data, LargeImage*& image){
     int count = 0;
+    
     //Sets the colour codes to the Matrix for the Wally matrix
     for(int rowcount = 0; rowcount < rows; rowcount++){
         for(int colcount = 0; colcount < cols; colcount++){
