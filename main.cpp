@@ -14,6 +14,7 @@
 #include <istream>
 #include <vector>
 #include <algorithm>
+#include <string>
 
 #include "matrix.h"
 #include "matchImage.h"
@@ -30,14 +31,16 @@ double* readTXT(string fileName, int sizeR, int sizeC);
 //Converts 1D array of doubles to .pgm image. Use Q = 255 for greyscale images and Q=1 for binary images.
 void WritePGM(string filename, double *data, int sizeR, int sizeC, int Q);
 
-//Prints the Progress of image
-void printProgress(int rowCount, int colCount, int clutteredCols, int clutteredRows);
+//Gets the search algorithm choice from the user
+int getAlgorithm();
 
+//Gets how the user wants to search the image
+int getSearchArea();
 
 int main() {
     
     //M and N represent the number of rows and columns in the image. Cluttered_scene, M = 768, N = 1024, Wally_grey, M = 49, N =  36
-    int clutteredRows = 768, clutteredCols = 1024, wallyRows = 49, wallyCols = 36, comparisons = 0;
+    int clutteredRows = 768, clutteredCols = 1024, wallyRows = 49, wallyCols = 36, comparisons = 0, count = 0;
     double SSD, NC;
     
     //Initiate the Matrices
@@ -48,20 +51,18 @@ int main() {
     string inputFileName = "Cluttered_scene.txt", wallyInputFileName = "Wally_Grey.txt";
     
     //Creates pointers to 1D arrays of doubles read in from the text files
-    double* cluttered_scene_input_data_NNS = 0;
+    double* cluttered_scene_input_data_SSD = 0;
     double* cluttered_scene_input_data_NC = 0;
     double* wally_input_data = 0;
     double* matrixAtArea;
    
     //input_data to hold the colour codes of the text files
-    cluttered_scene_input_data_NNS = readTXT(inputFileName, clutteredRows, clutteredCols);
+    cluttered_scene_input_data_SSD = readTXT(inputFileName, clutteredRows, clutteredCols);
     cluttered_scene_input_data_NC = readTXT(inputFileName, clutteredRows, clutteredCols);
     wally_input_data = readTXT(wallyInputFileName, wallyRows, wallyCols);
     
-
     
     //Sets the colour codes to the Matrix for the Wally matrix
-    int count = 0;
     for(int rowcount = 0; rowcount < wallyRows; rowcount++){
         for(int colcount = 0; colcount < wallyCols; colcount++){
             wallyImage->setPixel(rowcount, colcount, wally_input_data[count]);
@@ -69,117 +70,154 @@ int main() {
         }
     }
     
+    delete [] wally_input_data;
     
-    //Sets the colour codes to the Matrix for the cluttered scene
+    
+    //Sets the colour codes to the Matrix for the cluttered scene, also resets the value count
     count = 0;
     for(int rowcount = 0; rowcount < clutteredRows; rowcount++){
         for(int colcount = 0; colcount < clutteredCols; colcount++){
-            sceneImage->setPixel(rowcount, colcount, cluttered_scene_input_data_NNS[count]);
+            sceneImage->setPixel(rowcount, colcount, cluttered_scene_input_data_SSD[count]);
             sceneImage->setPixel(rowcount, colcount, cluttered_scene_input_data_NC[count]);
             count++;
         }
     }
     
-
     
-    //Arrays that now contain the function section matrices
+    //1D Array that now contain the Matrix of the Wally image
     double* wallyMatrixArea = wallyImage->getMatrixArea(0, 0, wallyRows, wallyCols);
+    
+    delete wallyImage;
 
     //Create the temporary objects using a copy constructor
-    MatchImage* tempMatrixObjectNNS = new MatchImage();
-    MatchImage tempMatrixObjectNC = *tempMatrixObjectNNS;
+    MatchImage* tempMatrixObjectSSD = new MatchImage();
+    MatchImage tempMatrixObjectNC = *tempMatrixObjectSSD;
     
-    //Can also be done with assignment operator
-    //MatchImage* tempMatrixObjectNC = tempMatrixObjectNNS;
+    
+    //*  *  *  *  *  *  *  *  *  *  *  *  *
+    //Can also be done with this assignment operator overload by uncommenting the following line and changing the pointer functions from . to ->
+    //MatchImage* tempMatrixObjectNC = tempMatrixObjectSSD;
+    //*  *  *  *  *  *  *  *  *  *  *  *  *
 
+    //Prepares the basic variales for the main loop
+    int algorithmChoice = getAlgorithm(), area = getSearchArea(), thresholdCols, thresholdRows;
+    
+    //Assign the threshold variables for searching the image
+    switch(area){
+        case 1:
+            thresholdRows = wallyRows / 3;
+            thresholdCols = wallyCols / 2;
+            break;
+        case 2:
+            thresholdRows = wallyRows / 2;
+            thresholdCols = wallyCols / 2;
+            break;
+        case 3:
+            thresholdCols = 1;
+            thresholdRows = 1;
+            break;
+        default:
+            cout << "ERROR - Please Restart the Program" << endl;
+    }
+    
     cout << "Searching for Wally..." << endl << endl;
-
-    //Main loop for running through the cluttered scene
-    for(int rowCount = 0; rowCount < clutteredRows - wallyRows; rowCount++){
-        for(int colCount = 0; colCount < clutteredCols - wallyCols; colCount++){
-            
-                //printProgress(rowCount, colCount, clutteredCols, clutteredRows);
+    
+    //Main loop for running through the scene
+    for(int rowCount = 0; rowCount < clutteredRows - wallyRows; rowCount = rowCount + thresholdRows){
+        for(int colCount = 0; colCount < clutteredCols - wallyCols; colCount = colCount + thresholdCols){
 
                 //Get 1D array of the scene area
                 matrixAtArea = sceneImage->getMatrixArea(rowCount, colCount, wallyRows, wallyCols);
             
-                //Workout SSD of the scene area
-                SSD = sceneImage->workoutSSD(wallyMatrixArea, matrixAtArea, wallyRows, wallyCols);
+                //Run the search algorithm on the retrieved Matrix area
+                if(algorithmChoice == 1){
+                    //Workout SSD of the scene area
+                    SSD = sceneImage->workoutSSD(wallyMatrixArea, matrixAtArea, wallyRows, wallyCols);
+                    
+                } else{
+                    //Workout NC of the scene area
+                    NC = sceneImage->workoutNC(wallyMatrixArea, matrixAtArea, wallyRows, wallyCols);
+                }
             
-                //Workout NC of the scene area
-                NC = sceneImage->workoutNC(wallyMatrixArea, matrixAtArea, wallyRows, wallyCols);
             
-                //Delete Matrix Area
+                //Delete Matrix Area ready for next use
                 delete [] matrixAtArea;
             
-                //Set initial objects if at the first row and col
+                //Set initial objects if the main loop is at the first row and col
                 if(rowCount == 0 && colCount == 0){
-                    tempMatrixObjectNNS->setStartingCol(colCount);
-                    tempMatrixObjectNNS->setStartingRow(rowCount);
-                    tempMatrixObjectNNS->setSSD(SSD);
-                
-                    tempMatrixObjectNC.setStartingCol(colCount);
-                    tempMatrixObjectNC.setStartingRow(rowCount);
-                    tempMatrixObjectNC.setNC(NC);
+                    if(algorithmChoice == 1){
+                        tempMatrixObjectSSD->setStartingCol(colCount);
+                        tempMatrixObjectSSD->setStartingRow(rowCount);
+                        tempMatrixObjectSSD->setSSD(SSD);
+                    } else{
+                        tempMatrixObjectNC.setStartingCol(colCount);
+                        tempMatrixObjectNC.setStartingRow(rowCount);
+                        tempMatrixObjectNC.setNC(NC);
+                    }
                 }
             
             
                 //Check if new SSD is smaller than what's stored in the current object, if it is then override the object, else the loop continues
-                if(SSD < tempMatrixObjectNNS->getSSD()){
-                    tempMatrixObjectNNS->setSSD(SSD);
-                    tempMatrixObjectNNS->setStartingRow(rowCount);
-                    tempMatrixObjectNNS->setStartingCol(colCount);
+                if(algorithmChoice == 1){
+                    if(SSD < tempMatrixObjectSSD->getSSD()){
+                        tempMatrixObjectSSD->setSSD(SSD);
+                        tempMatrixObjectSSD->setStartingRow(rowCount);
+                        tempMatrixObjectSSD->setStartingCol(colCount);
+                    }
+                } else{
+                    if(NC > tempMatrixObjectNC.getNC()){
+                        tempMatrixObjectNC.setNC(NC);
+                        tempMatrixObjectNC.setStartingRow(rowCount);
+                        tempMatrixObjectNC.setStartingCol(colCount);
+                    }
                 }
             
-                if(NC > tempMatrixObjectNC.getNC()){
-                    tempMatrixObjectNC.setNC(NC);
-                    tempMatrixObjectNC.setStartingRow(rowCount);
-                    tempMatrixObjectNC.setStartingCol(colCount);
-                }
-            
-            
-            comparisons++;
-
-        }
-        
+                //Update the number of comparisons
+                comparisons++;
+            }
     }
     
-    delete [] wallyMatrixArea;
+        //Delete the Wally Matrix area upon completion of the program
+        delete [] wallyMatrixArea;
     
-    cout << "Comparisons: " << comparisons << endl << endl;
+        cout << comparisons << " subimages have been compared." << endl << endl;;
 
         //Edit the cluttered scene inputs to where the program thinks Wally is at
-        cluttered_scene_input_data_NNS = sceneImage->draw(tempMatrixObjectNNS->getStartingRow(), tempMatrixObjectNNS->getStartingCol(), cluttered_scene_input_data_NNS, wallyRows, wallyCols, clutteredCols);
+        if(algorithmChoice == 1){
+            cluttered_scene_input_data_SSD = sceneImage->draw(tempMatrixObjectSSD->getStartingRow(), tempMatrixObjectSSD->getStartingCol(), cluttered_scene_input_data_SSD, wallyRows, wallyCols, clutteredCols);
+        } else{
+            cluttered_scene_input_data_NC = sceneImage->draw(tempMatrixObjectNC.getStartingRow(), tempMatrixObjectNC.getStartingCol(), cluttered_scene_input_data_NC, wallyRows, wallyCols, clutteredCols);
+        }
     
-        cluttered_scene_input_data_NC = sceneImage->draw(tempMatrixObjectNC.getStartingRow(), tempMatrixObjectNC.getStartingCol(), cluttered_scene_input_data_NC, wallyRows, wallyCols, clutteredCols);
+        delete sceneImage;
+        delete tempMatrixObjectSSD;
     
         //Write out the new scene showing where wally is. Q = 255 for greyscale images and 1 for binary images.
         int Q = 255;
     
         //Output filenames
-        string outputFileName_NNS = "SSD_result.pgm", outputFileName_NC = "NC_result.pgm";
+        string outputFileName_SSD = "SSD_result.pgm", outputFileName_NC = "NC_result.pgm";
     
         //Actually write data to the files
-        WritePGM(outputFileName_NNS, cluttered_scene_input_data_NNS, clutteredRows, clutteredCols, Q);
-        WritePGM(outputFileName_NC, cluttered_scene_input_data_NC, clutteredRows, clutteredCols, Q);
+        if(algorithmChoice == 1){
+            WritePGM(outputFileName_SSD, cluttered_scene_input_data_SSD, clutteredRows, clutteredCols, Q);
+        } else{
+            WritePGM(outputFileName_NC, cluttered_scene_input_data_NC, clutteredRows, clutteredCols, Q);
+        }
     
         //Delete objects
-        delete [] cluttered_scene_input_data_NNS;
-   
+        delete [] cluttered_scene_input_data_SSD;
         delete [] cluttered_scene_input_data_NC;
-
-        delete [] wally_input_data;
-  
-        delete wallyImage;
-  
-        delete sceneImage;
     
-        delete tempMatrixObjectNNS;
+        cout << "Search completed. I've drawn a black box around where I think Wally is. Your result is stored in the image file ";
     
-    
-    cout << "Processing complete!" << endl << endl;
+        if(algorithmChoice == 1){
+            cout << " 'SSD_result.pgm'." << endl << endl;
+        } else{
+            cout << " 'NC_result.pgm'." << endl << endl;
+        }
         
-    return 0;
+        return 0;
 }
 
 
@@ -254,12 +292,49 @@ void WritePGM(string filename, double *data, int sizeR, int sizeC, int Q){
     
 }
 
-void printProgress(int rowCount, int colCount, int clutteredCols, int clutteredRows){
-    //Print % of being done
-    double pos = (rowCount * clutteredCols  + colCount);
-    printf("\rSearching: %.2f%%", (pos / (clutteredCols * clutteredRows) * 100));
-    cout << endl;
+int getAlgorithm(){
+    
+    int algorithmChoice;
+  
+    do{
+        cout << endl << "-----------------------------------------------------------------------------" << endl;
+        cout << "Please select which Search Algorithm to use" << endl;
+        cout << "1 - Sum of Squared Differences" << endl;
+        cout << "2 - Normalised Correlation" << endl;
+        cout << "-----------------------------------------------------------------------------" << endl;
+        
+        cin >> algorithmChoice;
+    
+        if((algorithmChoice != 1) && (algorithmChoice != 2)){
+            cout << "Invalid Input! Please try again." << endl;
+        }
+        
+    } while((algorithmChoice != 1) && (algorithmChoice != 2));
+    
+    return algorithmChoice;
+}
 
+int getSearchArea(){
+    int area;
+
+    do{
+        cout << endl << "-----------------------------------------------------------------------------" << endl;
+        cout << "Please select which how to search the image" << endl;
+        cout << "1 - Small Area (Sub-image rows / 2 & sub-image rows / 3) (fastest)" << endl;
+        cout << "2 - Medium Area of Sub-image (Sub-image rows / 2 & sub-image rows / 2) (medium speed)" << endl;
+        cout << "3 - Whole Area (Pixel by Pixel) (slow)" << endl;
+        cout << "-----------------------------------------------------------------------------" << endl;
+        
+        cin >> area;
+        
+        if((area != 1) && (area != 2) && (area != 3)){
+            cout << "Invalid Input! Please try again" << endl;
+        }
+
+        
+    } while((area != 1) && (area != 2) && (area != 3));
+    
+    return area;
 }
 
 
