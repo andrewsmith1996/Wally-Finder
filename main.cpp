@@ -68,7 +68,7 @@ int main() {
     convertPixels(clutteredRows, clutteredCols, cluttered_scene_input_data_SSD, sceneImage);
     convertPixels(clutteredRows, clutteredCols, cluttered_scene_input_data_NC, sceneImage);
     
-    //Delete the date
+    //Delete the data
     delete [] wally_input_data;
     
     //Retrieve the Wally image values into a 1D Array
